@@ -101,6 +101,9 @@ function convert_toplevel(e) {
               raiseIf(!(param instanceof Parser.Symbol), "malformed param")
               return param.name;
             }).join(", ") + ") {\n" +
+            rest.map(function(bodyItem){
+              return convert_value(bodyItem) + ";\n";
+            }).join("") +
             "};";
         }
         else

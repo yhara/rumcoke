@@ -94,7 +94,7 @@ boolean
   ;
 
 number
-  : NUMBER { $$ = ["number", Number(yytext)]; }
+  : NUMBER { $$ = Number(yytext); }
   ;
 
 string
