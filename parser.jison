@@ -11,7 +11,7 @@ Symbol.prototype.inspect = function(depth){
   return "<" + this.name + ">";
 };
 var Symbols = {};
-var Sym = function(name){
+Sym = function(name){
   var found = Symbols[name];
   if (found) {
     return found;
@@ -19,7 +19,8 @@ var Sym = function(name){
   else {
     return (Symbols[name] = new Symbol(name));
   }
-}
+};
+exports.Sym = Sym;
 
 %}
 
@@ -39,7 +40,7 @@ var Sym = function(name){
 "*"   return "*";
 "/"   return "/";
 "%"   return "%";
-[a-zA-Z][a-zA-Z0-9]*  return "IDENT";
+[_a-zA-Z][_a-zA-Z0-9]*  return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
 "#/"[^/]*"/"          return "REGEXP";
