@@ -1,0 +1,18 @@
+RumCoke
+=======
+
+RumCoke is a programming language which has lisp-like syntax and translates into JavaScript.
+
+Idea
+----
+
+JavaScript has fairly similar semantics with Scheme.
+Then what 
+
+Install
+=======
+
+RumCoke requires Node.js.
+
+    $ npm install rumcoke -g
+    $ rumcoke hello.rmk > hello.js
