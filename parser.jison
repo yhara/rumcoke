@@ -36,6 +36,7 @@ exports.Symbol = Symbol;
 "#f"  return "#f";
 "null" return "null";
 "undefined" return "undefined";
+"{}"  return "{}";
 "("   return "(";
 ")"   return ")";
 "+"   return "+";
@@ -43,7 +44,7 @@ exports.Symbol = Symbol;
 "*"   return "*";
 "/"   return "/";
 "%"   return "%";
-[._a-zA-Z][._a-zA-Z0-9]*  return "IDENT";
+[._a-zA-Z][._a-zA-Z0-9]*"!"?  return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
 "#/"[^/]*"/"          return "REGEXP";
@@ -79,6 +80,7 @@ literal
   | number
   | string
   | regexp
+  | emptyobj
   | vector
   ;
 
@@ -102,7 +104,11 @@ string
   ;
 
 regexp
-  : REGEXP { $$ = ["regexp", yytext]; }
+  : REGEXP { $$ = new RegExp(yytext.slice(1, -1)); }
+  ;
+
+emptyobj
+  : "{}" { $$ = {}; }
   ;
 
 vector

@@ -18,7 +18,7 @@ exprs = parser.parse(' \
 (.. util (puts "--")) \
 \
 (define (raise msg info) \
-  (or info 99)) \
+  (or info (set! info {}))) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
@@ -57,6 +57,7 @@ function convert_value(v){
   else if(_.isString(v)){    return '"' + v.toString() + '"'; }
   else if(_.isNull(v)){      return "null"; }
   else if(_.isUndefined(v)){ return "undefined"; }
+  else if(_.isEmpty(v) ){ return "{}"; }
   else if(v instanceof Parser.Symbol) {
     return v.name;
   }
@@ -73,8 +74,13 @@ function convert_value(v){
           return "(" + convert_value(rest[0]) + ") || false"; 
         }
         else {
-          return rest.map(convert_value).join(" || ")
+          return rest.map(function(item){
+              // Note: wrapping with () in case of `a || (a = 1)'
+              return "(" + convert_value(item) + ")"; 
+            }).join(" || ");
         }
+      case "set!":
+        return convert_value(rest[0]) + " = " + convert_value(rest[1]);
       default:
         return first + "(" + rest.map(function(arg){
             return convert_value(arg);
