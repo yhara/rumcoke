@@ -15,6 +15,10 @@ exprs = parser.parse(' \
 \
 (.. Parser Sym) \
 (.. util (puts (.. util (inspect exprs #f null #t)))) \
+(.. util (puts "--")) \
+\
+(define (raise msg info) \
+  1) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
@@ -22,8 +26,13 @@ util.puts(util.inspect(exprs, false, null, true));
 util.puts("--");
 
 function raise(msg, info){
+  info || (info = {});
   info["ERROR"] = msg;
   throw util.inspect(info);
+}
+
+function raiseIf(cond, msg, info){
+  if (cond) { raise(msg, info) }
 }
 
 function convert_dotdot(receiver, callSpecs){
@@ -71,7 +80,31 @@ function convert_toplevel(e) {
   if (_.isArray(e)){
     switch (e[0]) {
       case Sym("define"):
-        return "var " + e[1].name + " = " + convert_value(e[2]) + ";";
+        var left = e[1], rest = e.slice(2);
+        if (left instanceof Parser.Symbol) {
+          // defvar
+          if (rest.length === 0) {
+            return "var" + left.name + ";"
+          }
+          else if (rest.length === 1) {
+            return "var " + left.name + " = " + convert_value(rest[0]) + ";";
+          }
+          else
+            raise("malformed defvar", {left:left, rest:rest});
+        }
+        else if (_.isArray(left)) {
+          // defun
+          var fname = left[0], params = left.slice(1);
+          raiseIf(!(fname instanceof Parser.Symbol), "malformed defun");
+          return "var " + fname.name + " = function(" + 
+            params.map(function(param){
+              raiseIf(!(param instanceof Parser.Symbol), "malformed param")
+              return param.name;
+            }).join(", ") + ") {\n" +
+            "};";
+        }
+        else
+          raise("malformed define", {left:left, rest:rest});
         break;
       default:
         return convert_value(e) + ";";
