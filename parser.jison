@@ -21,6 +21,7 @@ Sym = function(name){
   }
 };
 exports.Sym = Sym;
+exports.Symbol = Symbol;
 
 %}
 
@@ -40,7 +41,7 @@ exports.Sym = Sym;
 "*"   return "*";
 "/"   return "/";
 "%"   return "%";
-[_a-zA-Z][_a-zA-Z0-9]*  return "IDENT";
+[._a-zA-Z][._a-zA-Z0-9]*  return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
 "#/"[^/]*"/"          return "REGEXP";

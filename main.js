@@ -8,6 +8,7 @@ exprs = parser.parse(' \
 (define util (require "util")) \
 (define _ (require "underscore")) \
 (define Parser (require "./parser")) \
+(define parser (.. Parser parser)) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
@@ -21,11 +22,19 @@ function convert_value(v){
   else if(_.isString(v)){
     return '"' + v.toString() + '"';
   }
-  else if(_.isArray(v)){ // function call
-    var fname = v[0].name;
-    return fname + "(" + v.slice(1).map(function(arg){
-      return convert_value(arg);
-    }).join(", ") + ")";
+  else if(v instanceof Parser.Symbol) {
+    return v.name;
+  }
+  else if(_.isArray(v)){ // application
+    var first = v[0].name;
+    if (first === "..") {
+      return convert_value(v[1]) + "." + convert_value(v[2]);
+    }
+    else {
+      return first + "(" + v.slice(1).map(function(arg){
+        return convert_value(arg);
+      }).join(", ") + ")";
+    }
   }
   else {
     throw "failed to convert value";
