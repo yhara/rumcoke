@@ -18,7 +18,7 @@ exprs = parser.parse(' \
 (.. util (puts "--")) \
 \
 (define (raise msg info) \
-  1) \
+  (or info 99)) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
@@ -61,14 +61,24 @@ function convert_value(v){
     return v.name;
   }
   else if(_.isArray(v)){ // application
-    var first = v[0].name;
-    if (first === "..") {
-      return convert_dotdot(v[1], v.slice(2));
-    }
-    else {
-      return first + "(" + v.slice(1).map(function(arg){
-        return convert_value(arg);
-      }).join(", ") + ")";
+    var first = v[0].name, rest = v.slice(1);
+    switch(first){
+      case "..":
+        return convert_dotdot(v[1], v.slice(2));
+      case "or":
+        if (rest.length == 0) {
+          return "false";
+        }
+        else if(rest.length == 1){
+          return "(" + convert_value(rest[0]) + ") || false"; 
+        }
+        else {
+          return rest.map(convert_value).join(" || ")
+        }
+      default:
+        return first + "(" + rest.map(function(arg){
+            return convert_value(arg);
+          }).join(", ") + ")";
     }
   }
   else {
