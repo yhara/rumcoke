@@ -12,11 +12,19 @@ exprs = parser.parse(' \
 (define Sym (.. Parser Sym)) \
 \
 (define exprs (.. parser (parse "77"))) \
+\
+(.. Parser Sym) \
+(.. util (puts (.. util (inspect exprs #f null #t)))) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
 util.puts(util.inspect(exprs, false, null, true));
 util.puts("--");
+
+function raise(msg, info){
+  info["ERROR"] = msg;
+  throw util.inspect(info);
+}
 
 function convert_dotdot(receiver, callSpecs){
   return convert_value(receiver) + "." +
@@ -28,10 +36,7 @@ function convert_dotdot(receiver, callSpecs){
         return convert_value(callSpec);
       }
       else {
-        throw {msg: "malformed ..",
-               receiver: receiver,
-               callSpec: callSpec,
-               callSpecs: callSpecs};
+        raise("malformed ..", {receiver: receiver, callSpec: callSpec, callSpecs: callSpecs});
       }
     }).join(".");
 }
@@ -40,9 +45,9 @@ function convert_value(v){
   if (_.isNumber(v) || _.isBoolean(v) || _.isRegExp(v)){
     return v.toString();
   }
-  else if(_.isString(v)){
-    return '"' + v.toString() + '"';
-  }
+  else if(_.isString(v)){    return '"' + v.toString() + '"'; }
+  else if(_.isNull(v)){      return "null"; }
+  else if(_.isUndefined(v)){ return "undefined"; }
   else if(v instanceof Parser.Symbol) {
     return v.name;
   }
@@ -58,7 +63,7 @@ function convert_value(v){
     }
   }
   else {
-    throw "failed to convert value";
+    raise("failed to convert value", {v: v});
   }
 }
 
@@ -68,6 +73,8 @@ function convert_toplevel(e) {
       case Sym("define"):
         return "var " + e[1].name + " = " + convert_value(e[2]) + ";";
         break;
+      default:
+        return convert_value(e) + ";";
     }
   }
   else {
