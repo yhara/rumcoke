@@ -9,11 +9,32 @@ exprs = parser.parse(' \
 (define _ (require "underscore")) \
 (define Parser (require "./parser")) \
 (define parser (.. Parser parser)) \
+(define Sym (.. Parser Sym)) \
+\
+(define exprs (.. parser (parse "77"))) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
 util.puts(util.inspect(exprs, false, null, true));
 util.puts("--");
+
+function convert_dotdot(receiver, callSpecs){
+  return convert_value(receiver) + "." +
+    callSpecs.map(function(callSpec){
+      if (callSpec instanceof Parser.Symbol) {
+        return callSpec.name;
+      }
+      else if (_.isArray(callSpec)) {
+        return convert_value(callSpec);
+      }
+      else {
+        throw {msg: "malformed ..",
+               receiver: receiver,
+               callSpec: callSpec,
+               callSpecs: callSpecs};
+      }
+    }).join(".");
+}
 
 function convert_value(v){
   if (_.isNumber(v) || _.isBoolean(v) || _.isRegExp(v)){
@@ -28,7 +49,7 @@ function convert_value(v){
   else if(_.isArray(v)){ // application
     var first = v[0].name;
     if (first === "..") {
-      return convert_value(v[1]) + "." + convert_value(v[2]);
+      return convert_dotdot(v[1], v.slice(2));
     }
     else {
       return first + "(" + v.slice(1).map(function(arg){
