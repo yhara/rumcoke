@@ -24,7 +24,7 @@ exprs = parser.parse(' \
   (aset! info "ERROR" msg) \
   (throw (.. util (inspect info)))) \
 (define (raise-if cond msg info) \
-  1) \
+  (if cond (raise msg info) undefined)) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
@@ -86,11 +86,22 @@ function convert_value(v){
             }).join(" || ");
         }
       case "set!":
+        // TODO: syntax check
         return convert_value(rest[0]) + " = " + convert_value(rest[1]);
       case "aset!":
+        // TODO: syntax check
+        // TODO: successive aset (a[b][c] = d)
         return convert_value(rest[0]) + "[" +
                  convert_value(rest[1]) +
                "] = " + convert_value(rest[2]);
+      case "if":
+        // TODO: syntax check
+        return "if (" + convert_value(rest[0]) + ") {\n" +
+          "  " + convert_value(rest[1]) + ";\n" +
+          "}\n" +
+          "else {\n" +
+          "  " + convert_value(rest[2]) + ";\n" +
+          "}\n";
       case "throw":
         return "throw " + rest.map(convert_value).join(", ");
       default:
@@ -122,6 +133,7 @@ function convert_toplevel(e) {
         }
         else if (_.isArray(left)) {
           // defun
+          // TODO: Return value
           var fname = left[0], params = left.slice(1);
           raiseIf(!(fname instanceof Parser.Symbol), "malformed defun");
           return "var " + fname.jsName + " = function(" + 
