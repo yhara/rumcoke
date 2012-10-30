@@ -19,6 +19,7 @@ exprs = parser.parse(' \
 \
 (define (raise msg info) \
   (or info (set! info {}))) \
+  (aset! info "ERROR" msg) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
@@ -81,6 +82,10 @@ function convert_value(v){
         }
       case "set!":
         return convert_value(rest[0]) + " = " + convert_value(rest[1]);
+      case "aset!":
+        return convert_value(rest[0]) + "[" +
+                 convert_value(rest[1]) +
+               "] = " + convert_value(rest[2]);
       default:
         return first + "(" + rest.map(function(arg){
             return convert_value(arg);
