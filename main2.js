@@ -1,6 +1,7 @@
 // Using Escodegen https://github.com/Constellation/escodegen
 
 var util = require("util"),
+    fs = require("fs"),
     _ = require("underscore"),
     escodegen = require("escodegen");
 
@@ -10,9 +11,7 @@ isSymbol = function(x){
   return x instanceof Parser.Symbol;
 }
 
-exprs = parser.parse(' \
-(require "util") \
-');
+exprs = parser.parse(fs.readFileSync("rum_main.rmk", "utf8"));
 
 util.puts(util.inspect(exprs, false, null, true));
 util.puts("--");
@@ -30,6 +29,12 @@ function raiseIf(cond, msg, info){
 function ast(typename, info){
   info["type"] = typename;
   return info;
+}
+
+function convertDefvar(left, rest){
+}
+
+function convertDefun(left, rest){
 }
 
 // Returns JS-AST for Escodegen.
