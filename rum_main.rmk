@@ -5,6 +5,6 @@
 
 (define Parser (require "./parser"))
 (define parser (.. Parser parser))
-(define (isSymbol x)
+(define (symbol? x)
   (instance? x (.. Parser Symbol)))
 

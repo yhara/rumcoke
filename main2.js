@@ -82,7 +82,7 @@ function convertDefun(left, rest){
       kind: "var",
       declarations: [
         ast("VariableDeclarator", {
-          id: convertValue(left),
+          id: convertValue(fname),
           init: func
         })
       ]
@@ -118,12 +118,17 @@ function convertValue(v){
             object: convertValue(v[1]),
             property: convertValue(v[2])
           });
+      case "instance?":
+        return ast("BinaryExpression", {
+            operator: "instanceof",
+            left: convertValue(v[1]),
+            right: convertValue(v[2])
+          });
       default:
         return ast("CallExpression", {
             callee: convertValue(v[0]),
             arguments: rest.map(convertValue)
           });
-        throw 3;
     }
   }
   else {
