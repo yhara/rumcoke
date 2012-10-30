@@ -72,8 +72,13 @@ function convertDefun(left, rest){
       generator: false,
       expression: false,
       body: ast("BlockStatement", {
-              body: rest.map(function(bodyItem){
-                      return statementExpr(convertValue(bodyItem));
+              body: rest.map(function(bodyItem, idx){
+                      if (idx == rest.length-1) 
+                        return ast("ReturnStatement", {
+                            argument: convertValue(bodyItem)
+                          })
+                      else
+                        return statementExpr(convertValue(bodyItem));
                     })
             })
     });
