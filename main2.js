@@ -77,6 +77,12 @@ function convertValue(v){
           return convertDefun(left, rest);
         else
           raise("malformed define", {left:left, rest:rest});
+      case "..":
+        return ast("MemberExpression", {
+            computed: false,
+            object: convertValue(v[1]),
+            property: convertValue(v[2])
+          });
       default:
         return ast("CallExpression", {
             callee: convertValue(v[0]),
