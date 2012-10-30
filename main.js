@@ -1,5 +1,7 @@
 util = require("util");
 _ = require("underscore");
+//_.str = require('underscore.string');
+//_.mixin(_.str.exports());
 Parser = require("./parser");
 parser = Parser.parser;
 Sym = Parser.Sym;
@@ -21,6 +23,8 @@ exprs = parser.parse(' \
   (or info (set! info {})) \
   (aset! info "ERROR" msg) \
   (throw (.. util (inspect info)))) \
+(define (raise-if cond msg info) \
+  1) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
@@ -41,7 +45,7 @@ function convert_dotdot(receiver, callSpecs){
   return convert_value(receiver) + "." +
     callSpecs.map(function(callSpec){
       if (callSpec instanceof Parser.Symbol) {
-        return callSpec.name;
+        return callSpec.jsName;
       }
       else if (_.isArray(callSpec)) {
         return convert_value(callSpec);
@@ -61,7 +65,7 @@ function convert_value(v){
   else if(_.isUndefined(v)){ return "undefined"; }
   else if(_.isEmpty(v) ){ return "{}"; }
   else if(v instanceof Parser.Symbol) {
-    return v.name;
+    return v.jsName;
   }
   else if(_.isArray(v)){ // application
     var first = v[0].name, rest = v.slice(1);
@@ -108,10 +112,10 @@ function convert_toplevel(e) {
         if (left instanceof Parser.Symbol) {
           // defvar
           if (rest.length === 0) {
-            return "var" + left.name + ";"
+            return "var" + left.jsName + ";"
           }
           else if (rest.length === 1) {
-            return "var " + left.name + " = " + convert_value(rest[0]) + ";";
+            return "var " + left.jsName + " = " + convert_value(rest[0]) + ";";
           }
           else
             raise("malformed defvar", {left:left, rest:rest});
@@ -120,10 +124,10 @@ function convert_toplevel(e) {
           // defun
           var fname = left[0], params = left.slice(1);
           raiseIf(!(fname instanceof Parser.Symbol), "malformed defun");
-          return "var " + fname.name + " = function(" + 
+          return "var " + fname.jsName + " = function(" + 
             params.map(function(param){
               raiseIf(!(param instanceof Parser.Symbol), "malformed param")
-              return param.name;
+              return param.jsName;
             }).join(", ") + ") {\n" +
             rest.map(function(bodyItem){
               return convert_value(bodyItem) + ";\n";
