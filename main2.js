@@ -50,8 +50,43 @@ function convertDefvar(left, rest){
     });
 }
 
+function statementExpr(innerAst){
+  if (innerAst.type.match(/Expression$/))
+    return ast("ExpressionStatement", {expression: innerAst});
+  else
+    return innerAst;
+}
+
 function convertDefun(left, rest){
-  throw 4;
+  var fname = left[0], params = left.slice(1);
+  raiseIf(!isSymbol(fname), "malformed defun");
+
+  var func = ast("FunctionExpression", {
+      id: null,
+      params: params.map(function(param){
+        raiseIf(!isSymbol(param), "malformed param");
+        return convertValue(param)
+      }),
+      defaults: [],
+      rest: null,
+      generator: false,
+      expression: false,
+      body: ast("BlockStatement", {
+              body: rest.map(function(bodyItem){
+                      return statementExpr(convertValue(bodyItem));
+                    })
+            })
+    });
+
+  return ast("VariableDeclaration", {
+      kind: "var",
+      declarations: [
+        ast("VariableDeclarator", {
+          id: convertValue(left),
+          init: func
+        })
+      ]
+    });
 }
 
 // Returns JS-AST for Escodegen.

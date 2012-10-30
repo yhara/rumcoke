@@ -5,8 +5,7 @@ function Symbol(name){
   this.name = name;
   this.jsName = name.replace(/[-](\w)/g, function(match, c){
       return c.toUpperCase();
-    });
-
+    }).replace(/\?$/, "p");
 }
 Symbol.prototype.toString = function(){
   return "'" + this.name;
@@ -48,7 +47,7 @@ exports.Symbol = Symbol;
 "*"   return "*";
 "/"   return "/";
 "%"   return "%";
-[._a-zA-Z][-._a-zA-Z0-9]*"!"?  return "IDENT";
+[._a-zA-Z][-._a-zA-Z0-9]*[!\?]?  return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
 "#/"[^/]*"/"          return "REGEXP";
