@@ -18,8 +18,9 @@ exprs = parser.parse(' \
 (.. util (puts "--")) \
 \
 (define (raise msg info) \
-  (or info (set! info {}))) \
+  (or info (set! info {})) \
   (aset! info "ERROR" msg) \
+  (throw (.. util (inspect info)))) \
 '
 );
 //console.log(JSON.stringify(exprs, null, 2))
@@ -86,6 +87,8 @@ function convert_value(v){
         return convert_value(rest[0]) + "[" +
                  convert_value(rest[1]) +
                "] = " + convert_value(rest[2]);
+      case "throw":
+        return "throw " + rest.map(convert_value).join(", ");
       default:
         return first + "(" + rest.map(function(arg){
             return convert_value(arg);
