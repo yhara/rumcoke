@@ -32,9 +32,26 @@ function ast(typename, info){
 }
 
 function convertDefvar(left, rest){
+  if (rest.length === 0) 
+    var init = null;
+  else if (rest.length === 1)
+    var init = convertValue(rest[0]);
+  else
+    raise("malformed defvar", {left:left, rest:rest});
+
+  return ast("VariableDeclaration", {
+      kind: "var",
+      declarations: [
+        ast("VariableDeclarator", {
+          id: convertValue(left),
+          init: init
+        })
+      ]
+    });
 }
 
 function convertDefun(left, rest){
+  throw 4;
 }
 
 // Returns JS-AST for Escodegen.
@@ -53,7 +70,7 @@ function convertValue(v){
     var first = v[0].name, rest = v.slice(1);
     switch(first){
       case "define":
-        var left = e[1], rest = e.slice(2);
+        var left = v[1], rest = v.slice(2);
         if (isSymbol(left))
           return convertDefvar(left, rest);
         else if (_.isArray(left))

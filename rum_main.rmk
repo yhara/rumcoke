@@ -1,2 +1,8 @@
-(require "util")
+(define util (require "util"))
+(define fs (require "fs"))
+(define _ (require "underscore"))
+(define escodegen (require "escodegen"))
+
+(define Parser (require "./parser"))
+(define parser (.. Parser parser))
 
