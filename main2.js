@@ -146,6 +146,20 @@ var syntaxes = {
       });
   },
 
+  "aset!": function(v){
+    // TODO: syntax check
+    // TODO: successive aset (a[b][c] = d)
+    return ast("AssignmentExpression", {
+        operator: "=",
+        left: ast("MemberExpression", {
+            computed: true,
+            object: convertValue(v[1]), 
+            property: convertValue(v[2])
+          }),
+        right: convertValue(v[3])
+      });
+  },
+
   "or": function(v){
     var rest = v.slice(1);
     switch (rest.length){
