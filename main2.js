@@ -50,6 +50,18 @@ function convertDefvar(left, rest){
     });
 }
 
+// wrap with (function(){ ... })();
+function wrapWithFunctionCall(innerAst){
+  return ast("CallExpression", {
+    arguments: [],
+    callee: ast("FunctionExpression", {
+      params: [],
+      defaults: [],
+      body: ast("BlockStatement", {body: [statementExpr(innerAst)]})
+    })
+  });
+};
+
 function statementExpr(innerAst){
   if (innerAst.type.match(/Expression$/))
     return ast("ExpressionStatement", {expression: innerAst});
@@ -201,6 +213,15 @@ var syntaxes = {
               });
           }, convertValue(rest[0]));
     }
+  },
+
+  "throw": function(v, valueNeeded){
+    raiseIf(v.length !== 2, "malformed throw");
+    var throwStmt = ast("ThrowStatement", {argument: convertValue(v[1])});
+    if (valueNeeded)
+      return wrapWithFunctionCall(throwStmt);
+    else
+      return throwStmt;
   }
 }
 
