@@ -43,7 +43,7 @@ function convertDefvar(left, rest){
       kind: "var",
       declarations: [
         ast("VariableDeclarator", {
-          id: convertValue(left),
+          id: convertNode(left),
           init: init
         })
       ]
@@ -57,6 +57,10 @@ function statementExpr(innerAst){
     return innerAst;
 }
 
+function convertStmt(v){
+  return statementExpr(convertNode(v));
+}
+
 function convertDefun(left, rest){
   var fname = left[0], params = left.slice(1);
   raiseIf(!isSymbol(fname), "malformed defun");
@@ -64,18 +68,19 @@ function convertDefun(left, rest){
   var func = ast("FunctionExpression", {
       params: params.map(function(param){
         raiseIf(!isSymbol(param), "malformed param");
-        return convertValue(param)
+        return convertNode(param)
       }),
       defaults: [],
       body: ast("BlockStatement", {
               body: rest.map(function(bodyItem, idx){
-                      if (idx == rest.length-1) 
-                        // TODO: return(throw(1)); is invalid
+                      if (idx == rest.length-1) {
                         return ast("ReturnStatement", {
                             argument: convertValue(bodyItem)
                           })
-                      else
-                        return statementExpr(convertValue(bodyItem));
+                      }
+                      else {
+                        return convertStmt(bodyItem);
+                      }
                     })
             })
     });
@@ -84,7 +89,7 @@ function convertDefun(left, rest){
       kind: "var",
       declarations: [
         ast("VariableDeclarator", {
-          id: convertValue(fname),
+          id: convertNode(fname),
           init: func
         })
       ]
@@ -109,7 +114,7 @@ var syntaxes = {
           return ast("MemberExpression", {
               computed: false,
               object: acc,
-              property: convertValue(callSpec)
+              property: convertNode(callSpec)
             });
         }
         else if(_.isArray(callSpec)){
@@ -119,7 +124,7 @@ var syntaxes = {
               callee: ast("MemberExpression", {
                   computed: false,
                   object: acc,
-                  property: convertValue(callSpec[0])
+                  property: convertNode(callSpec[0])
                 }),
               arguments: callSpec.slice(1).map(convertValue)
             });
@@ -142,7 +147,7 @@ var syntaxes = {
     // TODO: syntax check
     return ast("AssignmentExpression", {
         operator: "=",
-        left: convertValue(v[1]), 
+        left: convertNode(v[1]), 
         right: convertValue(v[2])
       });
   },
@@ -155,10 +160,27 @@ var syntaxes = {
         left: ast("MemberExpression", {
             computed: true,
             object: convertValue(v[1]), 
-            property: convertValue(v[2])
+            property: convertNode(v[2])
           }),
         right: convertValue(v[3])
       });
+  },
+
+  "if": function(v, valueNeeded){
+    if (valueNeeded) {
+      return ast("ConditionalExpression", {
+          test: convertValue(v[1]),
+          consequent: convertNode(v[2], true),
+          alternate: convertNode(v[3], true)
+        });
+    }
+    else {
+      return ast("IfStatement", {
+          test: convertValue(v[1]),
+          consequent: convertStmt(v[2]),
+          alternate: convertStmt(v[3])
+        });
+    }
   },
 
   "or": function(v){
@@ -183,11 +205,21 @@ var syntaxes = {
 }
 
 
-// Returns JS-AST for Escodegen.
 function convertValue(v){
+  return convertNode(v, true);
+}
+
+// Returns JS-AST for Escodegen.
+function convertNode(v, valueNeeded){
   if (_.isNumber(v) || _.isString(v) || _.isRegExp(v) ||
-      _.isBoolean(v) || _.isNull(v) || _.isUndefined(v)){
+      _.isBoolean(v) || _.isNull(v)){
     return ast("Literal", {value: v});
+  }
+  else if(_.isUndefined(v)){
+    return ast("UnaryExpression", {
+      operator: "void", 
+      argument: ast("Literal", {value: 0})
+    });
   }
   else if(_.isEmpty(v)){
     return ast("ObjectExpression", {properties: []});
@@ -201,7 +233,7 @@ function convertValue(v){
 
     var conv = syntaxes[first.name];
     if (conv) {
-      return conv(v);
+      return conv(v, valueNeeded);
     }
     else {
       return ast("CallExpression", {
@@ -216,5 +248,7 @@ function convertValue(v){
 }
 
 exprs.forEach(function(expr){
-  util.puts(escodegen.generate(convertValue(expr)));
+  var ast = convertNode(expr);
+  //util.puts(util.inspect(ast, false, null, true));
+  util.puts(escodegen.generate(ast));
 });
