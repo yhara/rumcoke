@@ -13,8 +13,8 @@ isSymbol = function(x){
 
 exprs = parser.parse(fs.readFileSync("rum_main.rmk", "utf8"));
 
-util.puts(util.inspect(exprs, false, null, true));
-util.puts("--");
+//util.puts(util.inspect(exprs, false, null, true));
+//util.puts("--");
 
 function raise(msg, info){
   info || (info = {});
@@ -70,6 +70,7 @@ function convertDefun(left, rest){
       body: ast("BlockStatement", {
               body: rest.map(function(bodyItem, idx){
                       if (idx == rest.length-1) 
+                        // TODO: return(throw(1)); is invalid
                         return ast("ReturnStatement", {
                             argument: convertValue(bodyItem)
                           })
