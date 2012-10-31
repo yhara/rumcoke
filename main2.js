@@ -147,6 +147,23 @@ var syntaxes = {
   },
 
   "or": function(v){
+    var rest = v.slice(1);
+    switch (rest.length){
+      case 0: return ast("Literal", {value: false});
+      case 1: return ast("LogicalExpression", {
+                  operator: "||",
+                  left: convertValue(rest[0]),
+                  right: ast("Literal", {value: false})
+                });
+      default:
+        return rest.slice(1).reduce(function(acc, item){
+            return ast("LogicalExpression", {
+                operator: "||",
+                left: acc,
+                right: convertValue(item)
+              });
+          }, convertValue(rest[0]));
+    }
   }
 }
 
