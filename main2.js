@@ -62,15 +62,11 @@ function convertDefun(left, rest){
   raiseIf(!isSymbol(fname), "malformed defun");
 
   var func = ast("FunctionExpression", {
-      id: null,
       params: params.map(function(param){
         raiseIf(!isSymbol(param), "malformed param");
         return convertValue(param)
       }),
       defaults: [],
-      rest: null,
-      generator: false,
-      expression: false,
       body: ast("BlockStatement", {
               body: rest.map(function(bodyItem, idx){
                       if (idx == rest.length-1) 
@@ -118,11 +114,31 @@ function convertValue(v){
         else
           raise("malformed define", {left:left, rest:rest});
       case "..":
-        return ast("MemberExpression", {
-            computed: false,
-            object: convertValue(v[1]),
-            property: convertValue(v[2])
-          });
+        var receiver = v[1], callSpecs = v.slice(2);
+        return callSpecs.reduce(function(acc, callSpec){
+            if (isSymbol(callSpec)){
+              return ast("MemberExpression", {
+                  computed: false,
+                  object: acc,
+                  property: convertValue(callSpec)
+                });
+            }
+            else if(_.isArray(callSpec)){
+              raiseIf(!isSymbol(callSpec[0]), "malformed ..",
+                {expected: "Symbol", given: callSpec[0]})
+              return ast("CallExpression", {
+                  callee: ast("MemberExpression", {
+                      computed: false,
+                      object: acc,
+                      property: convertValue(callSpec[0])
+                    }),
+                  arguments: callSpec.slice(1).map(convertValue)
+                });
+            }
+            else
+              raise("malformed ..", {receiver: receiver, callSpec: callSpec,
+                                     callSpecs: callSpecs});
+          }, convertValue(receiver));
       case "instance?":
         return ast("BinaryExpression", {
             operator: "instanceof",

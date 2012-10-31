@@ -8,3 +8,4 @@
 (define (symbol? x)
   (instance? x (.. Parser Symbol)))
 
+(define exprs (.. parser (parse "77")))
