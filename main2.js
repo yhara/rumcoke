@@ -90,6 +90,55 @@ function convertDefun(left, rest){
     });
 }
 
+var syntaxes = {
+  define: function(v){
+    var left = v[1], rest = v.slice(2);
+    if (isSymbol(left))
+      return convertDefvar(left, rest);
+    else if (_.isArray(left))
+      return convertDefun(left, rest);
+    else
+      raise("malformed define", {left:left, rest:rest});
+  },
+
+  "..": function(v){
+      var receiver = v[1], callSpecs = v.slice(2);
+      return callSpecs.reduce(function(acc, callSpec){
+        if (isSymbol(callSpec)){
+          return ast("MemberExpression", {
+              computed: false,
+              object: acc,
+              property: convertValue(callSpec)
+            });
+        }
+        else if(_.isArray(callSpec)){
+          raiseIf(!isSymbol(callSpec[0]), "malformed ..",
+            {expected: "Symbol", given: callSpec[0]})
+          return ast("CallExpression", {
+              callee: ast("MemberExpression", {
+                  computed: false,
+                  object: acc,
+                  property: convertValue(callSpec[0])
+                }),
+              arguments: callSpec.slice(1).map(convertValue)
+            });
+        }
+        else
+          raise("malformed ..", {receiver: receiver, callSpec: callSpec,
+                                 callSpecs: callSpecs});
+      }, convertValue(receiver));
+  },
+
+  "instance?": function(v){
+    return ast("BinaryExpression", {
+        operator: "instanceof",
+        left: convertValue(v[1]),
+        right: convertValue(v[2])
+      });
+  }
+}
+
+
 // Returns JS-AST for Escodegen.
 function convertValue(v){
   if (_.isNumber(v) || _.isString(v) || _.isRegExp(v) ||
@@ -103,53 +152,18 @@ function convertValue(v){
     return ast("Identifier", {name: v.jsName});
   }
   else if(_.isArray(v)){ // application
-    var first = v[0].name, rest = v.slice(1);
-    switch(first){
-      case "define":
-        var left = v[1], rest = v.slice(2);
-        if (isSymbol(left))
-          return convertDefvar(left, rest);
-        else if (_.isArray(left))
-          return convertDefun(left, rest);
-        else
-          raise("malformed define", {left:left, rest:rest});
-      case "..":
-        var receiver = v[1], callSpecs = v.slice(2);
-        return callSpecs.reduce(function(acc, callSpec){
-            if (isSymbol(callSpec)){
-              return ast("MemberExpression", {
-                  computed: false,
-                  object: acc,
-                  property: convertValue(callSpec)
-                });
-            }
-            else if(_.isArray(callSpec)){
-              raiseIf(!isSymbol(callSpec[0]), "malformed ..",
-                {expected: "Symbol", given: callSpec[0]})
-              return ast("CallExpression", {
-                  callee: ast("MemberExpression", {
-                      computed: false,
-                      object: acc,
-                      property: convertValue(callSpec[0])
-                    }),
-                  arguments: callSpec.slice(1).map(convertValue)
-                });
-            }
-            else
-              raise("malformed ..", {receiver: receiver, callSpec: callSpec,
-                                     callSpecs: callSpecs});
-          }, convertValue(receiver));
-      case "instance?":
-        return ast("BinaryExpression", {
-            operator: "instanceof",
-            left: convertValue(v[1]),
-            right: convertValue(v[2])
-          });
-      default:
-        return ast("CallExpression", {
-            callee: convertValue(v[0]),
-            arguments: rest.map(convertValue)
-          });
+    var first = v[0], rest = v.slice(1);
+    raiseIf(!(isSymbol(first)), "TODO")
+
+    var conv = syntaxes[first.name];
+    if (conv) {
+      return conv(v);
+    }
+    else {
+      return ast("CallExpression", {
+          callee: convertValue(v[0]),
+          arguments: rest.map(convertValue)
+        });
     }
   }
   else {
