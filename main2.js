@@ -135,6 +135,18 @@ var syntaxes = {
         left: convertValue(v[1]),
         right: convertValue(v[2])
       });
+  },
+
+  "set!": function(v){
+    // TODO: syntax check
+    return ast("AssignmentExpression", {
+        operator: "=",
+        left: convertValue(v[1]), 
+        right: convertValue(v[2])
+      });
+  },
+
+  "or": function(v){
   }
 }
 
