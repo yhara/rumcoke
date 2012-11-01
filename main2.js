@@ -178,6 +178,30 @@ var syntaxes = {
       });
   },
 
+  "aref": function(v){
+    // TODO: successive aref
+    return ast("MemberExpression", {
+      computed: true,
+      object: convertValue(v[1]),
+      property: convertValue(v[2])
+    });
+  },
+
+  "array": function(v){
+    return ast("ArrayExpression", {
+      elements: v.slice(1).map(convertValue)
+    });
+  },
+
+  "=": function(v) {
+    raiseIf(v.length !== 3, "malformed =");
+    return ast("BinaryExpression", {
+      operator: "===",
+      left: convertValue(v[1]),
+      right: convertValue(v[2])
+    });
+  },
+
   "if": function(v, valueNeeded){
     if (valueNeeded) {
       return ast("ConditionalExpression", {
@@ -263,8 +287,16 @@ function convertNode(v, valueNeeded){
         });
     }
   }
-  else {
-    throw 2;
+  else { // object
+    return ast("ObjectExpression", {
+      properties: _.pairs(v).map(function(pair){
+        return ast("Property", {
+          kind: "init",
+          key: ast("Identifier", {name: pair[0]}),
+          value: convertValue(pair[1])
+        });
+      })
+    });
   }
 }
 

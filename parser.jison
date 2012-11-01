@@ -47,7 +47,9 @@ exports.Symbol = Symbol;
 "*"   return "*";
 "/"   return "/";
 "%"   return "%";
-[._a-zA-Z][-._a-zA-Z0-9]*[!\?]?  return "IDENT";
+"="   return "IDENT";
+[_a-zA-Z][_a-zA-Z0-9]*":"  return "KEYWORD";
+[._a-zA-Z][-._a-zA-Z0-9]*[!\?]?     return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
 "#/"[^/]*"/"          return "REGEXP";
@@ -73,11 +75,6 @@ exprs
   ;
 
 expr
-  : literal
-  | array
-  ;
-
-literal
   : ident
   | boolean
   | number
@@ -85,6 +82,8 @@ literal
   | regexp
   | emptyobj
   | vector
+  | array
+  | object
   ;
 
 ident
@@ -120,4 +119,19 @@ vector
 
 array
   : "(" exprs ")" { $$ = $2; }
+  ;
+
+object
+  : "(" properties ")" { $$ = $2; }
+  ;
+
+properties
+  : keyword expr
+    { $$ = {}; $$[$1] = $2; }
+  | properties keyword expr
+    { $$ = $1; $$[$2] = $3; }
+  ;
+
+keyword
+  : KEYWORD { $$ = yytext.slice(0, -1); }
   ;
