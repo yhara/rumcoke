@@ -4,19 +4,19 @@
 (define escodegen (require "escodegen"))
 
 (define Parser (require "./parser"))
-(define parser (.. Parser parser))
+(define parser Parser.parser)
 (define (symbol? x)
-  (instance? x (.. Parser Symbol)))
+  (instance? x Parser.Symbol))
 
-(define exprs (.. parser (parse "77")))
+(define exprs (parser.parse "77"))
 
-(.. util (puts (.. util (inspect exprs #f null #t))))
-(.. util (puts "--"))
+(util.puts (util.inspect exprs #f null #t))
+(util.puts "--")
 
 (define (raise msg info)
   (or info (set! info {}))
   (aset! info "ERROR" msg)
-  (throw (.. util (inspect info))))
+  (throw (util.inspect info)))
 (define (raise-if cond msg info)
   (if cond (raise msg info) undefined))
 
@@ -25,9 +25,9 @@
   info)
 
 (define (convert-defvar left rest)
-  (define init (if (= (.. rest length) 0)
+  (define init (if (= rest.length 0)
                  null
-                 (if (= (.. rest length) 1)
+                 (if (= rest.length 1)
                    (convert-value (aref rest 0))
                    (raise "malformed defvar" (receiver: receiver)))))
   (ast "VariableDeclaration"
@@ -57,9 +57,10 @@
   (define fname (aref left 0))
   (define params (.. left (slice 1)))
   (raise-if (not (symbol? fname)) "malformed defun")
- ) 
-;  (define func 
-;    (ast "FunctionExpression"
-;      (params: (.. params (_.map 
+  
+  (define func 
+    (ast "FunctionExpression"
+      (params: (_.map 1 params))))
+  #f)
 
 

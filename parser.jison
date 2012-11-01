@@ -37,6 +37,7 @@ alpha [a-zA-Z]
 alpha_ [a-zA-Z_]
 alnum [a-zA-Z0-9]
 alnum_ [a-zA-Z0-9_]
+js_ident {alpha_}{alnum_}*
 
 %%
 
@@ -57,7 +58,8 @@ alnum_ [a-zA-Z0-9_]
 "%"   return "%";
 "="   return "IDENT";
 ".."  return "IDENT";
-{alpha_}{alnum_}*":"              return "KEYWORD";
+{js_ident}"."{js_ident}          return "PROPREF";
+{js_ident}*":"                   return "KEYWORD";
 {alpha_}[-_a-zA-Z0-9]*[!\?]?     return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
@@ -93,6 +95,7 @@ expr
   | vector
   | array
   | object
+  | propref
   ;
 
 ident
@@ -134,13 +137,19 @@ object
   : "(" properties ")" { $$ = $2; }
   ;
 
-properties
-  : keyword expr
-    { $$ = {}; $$[$1] = $2; }
-  | properties keyword expr
-    { $$ = $1; $$[$2] = $3; }
-  ;
+  properties
+    : keyword expr
+      { $$ = {}; $$[$1] = $2; }
+    | properties keyword expr
+      { $$ = $1; $$[$2] = $3; }
+    ;
 
-keyword
-  : KEYWORD { $$ = yytext.slice(0, -1); }
+  keyword
+    : KEYWORD { $$ = yytext.slice(0, -1); }
+    ;
+
+propref
+  : PROPREF
+    { var _tmp = yytext.match(/(.+)\.(.+)/);
+      $$ = [Sym(".."), Sym(_tmp[1]), Sym(_tmp[2])]; }
   ;

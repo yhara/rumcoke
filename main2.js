@@ -12,6 +12,7 @@ isSymbol = function(x){
 }
 
 exprs = parser.parse(fs.readFileSync("rum_main.rmk", "utf8"));
+//exprs = parser.parse("a.b");
 
 //util.puts(util.inspect(exprs, false, null, true));
 //util.puts("--");
@@ -283,9 +284,8 @@ function convertNode(v, valueNeeded){
   }
   else if(_.isArray(v)){ // application
     var first = v[0], rest = v.slice(1);
-    raiseIf(!(isSymbol(first)), "TODO")
+    var conv = isSymbol(first) && syntaxes[first.name];
 
-    var conv = syntaxes[first.name];
     if (conv) {
       return conv(v, valueNeeded);
     }
