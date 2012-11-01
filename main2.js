@@ -64,7 +64,8 @@ function wrapWithFunctionCall(innerAst){
 };
 
 function statementExpr(innerAst){
-  if (innerAst.type.match(/Expression$/))
+  if (innerAst.type == "Literal" ||
+      innerAst.type.match(/Expression$/))
     return ast("ExpressionStatement", {expression: innerAst});
   else
     return innerAst;
@@ -327,8 +328,58 @@ function convertNode(v, valueNeeded){
   }
 }
 
-exprs.forEach(function(expr){
-  var ast = convertNode(expr);
+// Macro
+var macros = {
+  "when": function(v){
+    // TODO: wrap with begin
+    return [Sym("if"), v[1], v[2]];
+  }
+}
+
+function expandMacros(v, mod) {
+  util.puts("!!! expandMacros" + util.inspect(v));
+  mod || (mod = {});
+
+  if (_.isArray(v)) {
+    if (isSymbol(s)) {
+      // TODO: switch(s.name) { ...
+      if (syntaxes[s.name]) {
+        // v is special form. Cannot expand
+        return v;
+      }
+      else if(macros[s.name]){
+        // Found macro usage.
+        util.puts("!!! macro found");
+        mod["modified"] = true;
+        var ret = macros[s.name](v);
+
+        // Continue macro expansion until no macro is contained
+        while(true){
+          var _mod = {};
+          ret = expandMacros(ret, _mod);
+          if (!_mod["modified"]) break;
+        }
+        return ret;
+      }
+      else {
+        // Normal function call. Should expand arguments
+        return v.map(function(x){ return expandMacros(x, mod); });
+      }
+    }
+    else {
+      // Computed function call.
+      return v.map(function(x){ return expandMacros(x, mod); });
+    }
+  }
+  else {
+    // Literal value.
+    return v;
+  }
+}
+//exprs = exprs.map(expandMacros);
+
+exprs.forEach(function(rumExpr){
+  var ast = convertNode(rumExpr);
   //util.puts(util.inspect(ast, false, null, true));
   util.puts(escodegen.generate(ast));
 });
