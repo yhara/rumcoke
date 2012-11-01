@@ -56,4 +56,10 @@
 (define (convert-defun left rest)
   (define fname (aref left 0))
   (define params (.. left (slice 1)))
-  (raise-if (not (symbol? fname)) "malformed defun"))
+  (raise-if (not (symbol? fname)) "malformed defun")
+ ) 
+;  (define func 
+;    (ast "FunctionExpression"
+;      (params: (.. params (_.map 
+
+

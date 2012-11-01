@@ -31,9 +31,17 @@ exports.Symbol = Symbol;
 /* -- Lex -- */
 
 %lex
+
+digit [0-9]
+alpha [a-zA-Z]
+alpha_ [a-zA-Z_]
+alnum [a-zA-Z0-9]
+alnum_ [a-zA-Z0-9_]
+
 %%
 
-\s+ /* skip whitespace */
+\s+     /* skip whitespace */
+";".*   /* comment */
 "#("  return "#(";
 "#t"  return "#t";
 "#f"  return "#f";
@@ -48,8 +56,9 @@ exports.Symbol = Symbol;
 "/"   return "/";
 "%"   return "%";
 "="   return "IDENT";
-[_a-zA-Z][_a-zA-Z0-9]*":"  return "KEYWORD";
-[._a-zA-Z][-._a-zA-Z0-9]*[!\?]?     return "IDENT";
+".."  return "IDENT";
+{alpha_}{alnum_}*":"              return "KEYWORD";
+{alpha_}[-_a-zA-Z0-9]*[!\?]?     return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
 "#/"[^/]*"/"          return "REGEXP";
