@@ -51,12 +51,7 @@ js_ident {alpha_}{alnum_}*
 "{}"  return "{}";
 "("   return "(";
 ")"   return ")";
-"+"   return "+";
-"-"   return "-";
-"*"   return "*";
-"/"   return "/";
-"%"   return "%";
-"="   return "IDENT";
+[-+*/%=^]  return "IDENT";
 ".."  return "IDENT";
 {js_ident}"."{js_ident}          return "PROPREF";
 {js_ident}*":"                   return "KEYWORD";

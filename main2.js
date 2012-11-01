@@ -74,19 +74,16 @@ function convertStmt(v){
   return statementExpr(convertNode(v));
 }
 
-function convertDefun(left, rest){
-  var fname = left[0], params = left.slice(1);
-  raiseIf(!isSymbol(fname), "malformed defun");
-
-  var func = ast("FunctionExpression", {
-      params: params.map(function(param){
+function functionWithReturn(paramsAry, defaults, bodyExprs){
+  return ast("FunctionExpression", {
+      params: paramsAry.map(function(param){
         raiseIf(!isSymbol(param), "malformed param");
         return convertNode(param)
       }),
-      defaults: [],
+      defaults: defaults,
       body: ast("BlockStatement", {
-              body: rest.map(function(bodyItem, idx){
-                      if (idx == rest.length-1) {
+              body: bodyExprs.map(function(bodyItem, idx){
+                      if (idx == bodyExprs.length-1) {
                         return ast("ReturnStatement", {
                             argument: convertValue(bodyItem)
                           })
@@ -97,13 +94,18 @@ function convertDefun(left, rest){
                     })
             })
     });
+}
+
+function convertDefun(left, rest){
+  var fname = left[0], params = left.slice(1);
+  raiseIf(!isSymbol(fname), "malformed defun");
 
   return ast("VariableDeclaration", {
       kind: "var",
       declarations: [
         ast("VariableDeclarator", {
           id: convertNode(fname),
-          init: func
+          init: functionWithReturn(params, [], rest)
         })
       ]
     });
@@ -118,6 +120,11 @@ var syntaxes = {
       return convertDefun(left, rest);
     else
       raise("malformed define", {left:left, rest:rest});
+  },
+
+  "^": function(v){
+    raiseIf(!_.isArray(v[1]), "malformed function literal params");
+    return functionWithReturn(v[1], [], v.slice(2));
   },
 
   "..": function(v){

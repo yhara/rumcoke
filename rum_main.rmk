@@ -60,7 +60,13 @@
   
   (define func 
     (ast "FunctionExpression"
-      (params: (_.map 1 params))))
-  #f)
+      (params: (_.map params (^(param)
+                               (raise-if (not (symbol? param))
+                                         "malformed defun param")
+                               (convert-node param)))
+       defaults: (array)
+       body: (ast "BlockStatement"
+                  (body: (_.map rest 1))))))
+  func)
 
 
