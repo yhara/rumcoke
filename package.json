@@ -11,10 +11,10 @@
     },
     "main": "./lib/rumcoke.js",
     "dependencies" : {
-        "optparse" : "1.0.3",
-        "underscore" : "1.2.2",
-        "underscore.string" : "2.0.0",
-        "jison" : "0.3.12"
+        "optparse" : "~1.0.3",
+        "underscore" : "~1.4.2",
+        "escodegen" : "~0.0.12",
+        "jison" : "~0.3.12"
     },
     "bin": { "rumcoke": "./bin/rumcoke" }
 }
