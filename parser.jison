@@ -40,10 +40,18 @@ alnum_ [a-zA-Z0-9_]
 js_ident {alpha_}{alnum_}*
 rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 
+/* Define exclusive start conditon for multi-line comment */
+%x ML_COMMENT
 %%
+
+<INITIAL>"#|"           this.begin("ML_COMMENT");
+<ML_COMMENT>[^\|]+      /* skip until | */
+<ML_COMMENT>"|"[^#]     /* skip unless |# */
+<ML_COMMENT>"|#"        this.begin("INITIAL");
 
 \s+     /* skip whitespace */
 ";".*   /* comment */
+"#|"(.|.)*"|#"  /* comment */
 "#("  return "#(";
 "#t"  return "#t";
 "#f"  return "#f";
@@ -52,7 +60,7 @@ rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 "{}"  return "{}";
 "("   return "(";
 ")"   return ")";
-[-+*/%=^]  return "IDENT";
+[-+*/%=^\|]  return "IDENT";
 ".."  return "IDENT";
 {rmk_ident}"."{js_ident}         return "PROPREF";
 {js_ident}*":"                   return "KEYWORD";

@@ -73,8 +73,26 @@
   (define params (.. left (slice 1)))
   (raise-if (not (symbol? fname)) "malformed defun")
   
-  (define func 
-    )
-  func)
+  (ast "VariableDeclaration"
+    (kind: "var"
+     declarations: (array (ast "VariableDeclarator"
+                            (id: (convert-node fname)
+                             init: (functoin-with-return params (array) rest)))))))
+
+; ---
+
+(define (convert-value v)
+  (convert-node v #t))
+
+;(define (convert-node v value-needed?)
+;  (if (or (_.isNumber v) (_.isString v) (_.isRegExp v)
+;          (_.isBoolean v) (_.isNull v))
 
 
+#|
+
+(exprs.forEach (^(expr)
+                 (define ast (convert-node expr))
+                 ;(util.puts (util.inspect ast #f null #t))
+                 (util.puts (escodegen.generate ast))))
+|#
