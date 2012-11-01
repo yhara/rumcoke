@@ -35,3 +35,25 @@
         declarations: (array (ast "VariableDeclarator"
                                   (id: (convert-node left)
                                    init: init))))))
+
+(define (wrap-with-function-call inner-ast)
+  (ast "CallExpression"
+       (arguments: (array)
+        callee: (ast "FunctionExpression"
+                     (params: (array)
+                      defaults: (array)
+                      body: (ast "BlockStatement"
+                                 (body: (array (statement-expr inner-ast)))))))))
+
+(define (statement-expr inner-ast)
+  (if (.. inner-ast type (match #/Expression$/))
+    (ast "ExpressionStatement" (expression: inner-ast))
+    inner-ast))
+
+(define (convert-stmt v)
+  (statement-expr (convert-node v)))
+
+(define (convert-defun left rest)
+  (define fname (aref left 0))
+  (define params (.. left (slice 1)))
+  (raise-if (not (symbol? fname)) "malformed defun"))

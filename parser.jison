@@ -106,7 +106,7 @@ string
   ;
 
 regexp
-  : REGEXP { $$ = new RegExp(yytext.slice(1, -1)); }
+  : REGEXP { $$ = new RegExp(yytext.slice(2, -1)); }
   ;
 
 emptyobj

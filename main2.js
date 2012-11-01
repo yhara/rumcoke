@@ -180,6 +180,7 @@ var syntaxes = {
 
   "aref": function(v){
     // TODO: successive aref
+    raiseIf(v.length !== 3, "malformed aref");
     return ast("MemberExpression", {
       computed: true,
       object: convertValue(v[1]),
@@ -237,6 +238,14 @@ var syntaxes = {
               });
           }, convertValue(rest[0]));
     }
+  },
+
+  "not": function(v){
+    raiseIf(v.length !== 2, "malformed not");
+    return ast("UnaryExpression", {
+      operator: "!",
+      argument: convertValue(v[1])
+    });
   },
 
   "throw": function(v, valueNeeded){
