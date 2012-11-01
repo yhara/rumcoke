@@ -264,7 +264,18 @@ var syntaxes = {
     else
       return throwStmt;
   }
-}
+};
+
+["+", "-", "*", "/"].forEach(function(op){
+  syntaxes[op] = function(v){
+    // TODO: (+ 1 2 3)
+    return ast("BinaryExpression", {
+      operator: op,
+      left: convertValue(v[1]),
+      right: convertValue(v[2])
+    });
+  };
+});
 
 
 function convertValue(v){

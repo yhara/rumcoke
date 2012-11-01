@@ -53,20 +53,28 @@
 (define (convert-stmt v)
   (statement-expr (convert-node v)))
 
+(define (functoin-with-return params-ary defaults body-exprs)
+  (ast "FunctionExpression"
+       (params: (_.map params-ary
+                       (^(param)
+                         (raise-if (not (symbol? param)) "malformed defun param")
+                         (convert-node param)))
+        defaults: defaults
+        body: (ast "BlockStatement"
+                   (body: (_.map body-exprs
+                                 (^(body-item idx)
+                                   (if (= idx (- body-exprs.length 1))
+                                     (ast "ReturnStatement"
+                                          (argument: (convert-value body-item)))
+                                     (convert-stmt body-item)))))))))
+
 (define (convert-defun left rest)
   (define fname (aref left 0))
   (define params (.. left (slice 1)))
   (raise-if (not (symbol? fname)) "malformed defun")
   
   (define func 
-    (ast "FunctionExpression"
-      (params: (_.map params (^(param)
-                               (raise-if (not (symbol? param))
-                                         "malformed defun param")
-                               (convert-node param)))
-       defaults: (array)
-       body: (ast "BlockStatement"
-                  (body: (_.map rest 1))))))
+    )
   func)
 
 

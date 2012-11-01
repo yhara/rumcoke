@@ -38,6 +38,7 @@ alpha_ [a-zA-Z_]
 alnum [a-zA-Z0-9]
 alnum_ [a-zA-Z0-9_]
 js_ident {alpha_}{alnum_}*
+rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 
 %%
 
@@ -53,9 +54,9 @@ js_ident {alpha_}{alnum_}*
 ")"   return ")";
 [-+*/%=^]  return "IDENT";
 ".."  return "IDENT";
-{js_ident}"."{js_ident}          return "PROPREF";
+{rmk_ident}"."{js_ident}         return "PROPREF";
 {js_ident}*":"                   return "KEYWORD";
-{alpha_}[-_a-zA-Z0-9]*[!\?]?     return "IDENT";
+{rmk_ident}                      return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
 "#/"[^/]*"/"          return "REGEXP";
