@@ -5,7 +5,9 @@ function Symbol(name){
   this.name = name;
   this.jsName = name.replace(/[-](\w)/g, function(match, c){
       return c.toUpperCase();
-    }).replace(/\?$/, "p");
+    }).replace(/^(\w)(.*)\?$/, function(match, c, rest){
+      return "is" + c.toUpperCase() + rest;
+    });
 }
 Symbol.prototype.toString = function(){
   return "'" + this.name;
@@ -62,7 +64,7 @@ rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 ")"   return ")";
 [-+*/%=^\|~]  return "IDENT";
 ".."  return "IDENT";
-{rmk_ident}"."{js_ident}         return "PROPREF";
+{rmk_ident}"."{rmk_ident}         return "PROPREF";
 {js_ident}*":"                   return "KEYWORD";
 '"'[^"]*'":'                     return "STR_KEYWORD";
 {rmk_ident}                      return "IDENT";
