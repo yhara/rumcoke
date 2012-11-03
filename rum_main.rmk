@@ -1,3 +1,5 @@
+; vim: set ft=scheme:
+#|
 (define util (require "util"))
 (define fs (require "fs"))
 (define _ (require "underscore"))
@@ -84,10 +86,36 @@
 (define (convert-value v)
   (convert-node v #t))
 
-;(define (convert-node v value-needed?)
-;  (if (or (_.isNumber v) (_.isString v) (_.isRegExp v)
-;          (_.isBoolean v) (_.isNull v))
 
+(define (convert-node v value-needed?)
+  (if (or (_.isNumber v) (_.isString v) (_.isRegExp v)
+            (_.isBoolean v) (_.isNull v))
+    (ast "Literal" (value: v))
+    (if (_.isUndefined v)
+      (ast "UnaryExpression"
+        (operator: "void" argument: (ast "Literal" (value: 0))))
+      (if (_.isEmpty(v))
+        ; TODO: Replace this with `(new Object)'
+        (ast "ObjectExpression" (properties: (array)))
+        (if (symbol? v)
+          (ast "Identifier" (name: v.jsName))
+          (if (_.isArray v)
+            ; Application
+            (begin
+              (define first (aref v 0))
+              (define rest (v.slice 1))
+              (define conv (if (symbol? first)
+                             (aref syntaxes first.name)
+                             #f))
+              (if conv
+                (conv v value-needed?)
+                (ast "CallExpression"
+                  (callee: (convert-value (aref v 0))
+                   arguments: (rest.map convert-value)))))
+            ; Object
+            (ast "ObjectExpression" TODO)))))))
+
+|#
 
 #|
 

@@ -71,8 +71,24 @@ function statementExpr(innerAst){
     return innerAst;
 }
 
+// Convert v but ensure return a Statement
 function convertStmt(v){
   return statementExpr(convertNode(v));
+}
+
+function blockStmtWithReturn(bodyExprs){
+  return ast("BlockStatement", {
+    body: bodyExprs.map(function(bodyItem, idx){
+            if (idx == bodyExprs.length-1) {
+              return ast("ReturnStatement", {
+                argument: convertValue(bodyItem)
+              })
+            }
+            else {
+              return convertStmt(bodyItem);
+            }
+          })
+  });
 }
 
 function functionWithReturn(paramsAry, defaults, bodyExprs){
@@ -82,18 +98,7 @@ function functionWithReturn(paramsAry, defaults, bodyExprs){
         return convertNode(param)
       }),
       defaults: defaults,
-      body: ast("BlockStatement", {
-              body: bodyExprs.map(function(bodyItem, idx){
-                      if (idx == bodyExprs.length-1) {
-                        return ast("ReturnStatement", {
-                            argument: convertValue(bodyItem)
-                          })
-                      }
-                      else {
-                        return convertStmt(bodyItem);
-                      }
-                    })
-            })
+      body: blockStmtWithReturn(bodyExprs)
     });
 }
 
@@ -226,6 +231,24 @@ var syntaxes = {
           consequent: convertStmt(v[2]),
           alternate: convertStmt(v[3])
         });
+    }
+  },
+
+  "begin": function(v, valueNeeded){
+    if (valueNeeded) {
+      return ast("CallExpression", {
+        arguments: [],
+        callee: ast("FunctionExpression", {
+          params: [],
+          defaults: [],
+          body: blockStmtWithReturn(v.slice(1))
+        })
+      });
+    }
+    else {
+      return ast("BlockStatement", {
+        body: v.slice(1).map(convertStmt)
+      });
     }
   },
 
