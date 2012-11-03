@@ -88,7 +88,10 @@
       (convert-defvar left rest)
       (if (_.isArray left)
         (convert-defun left rest)
-        (raise "malformed define" (left: left rest: rest)))))))
+        (raise "malformed define" (left: left rest: rest)))))
+   "^": (^(v)
+    (raise-if (not (_.isArray (~ v 1))) "malformed function literal params")
+    (function-with-return (~ v 1) (array) (v.slice 2)))))
 
 #|
 

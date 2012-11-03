@@ -343,7 +343,7 @@ function convertNode(v, valueNeeded){
       properties: _.pairs(v).map(function(pair){
         return ast("Property", {
           kind: "init",
-          key: ast("Identifier", {name: pair[0]}),
+          key: ast("Literal", {value: pair[0]}),
           value: convertValue(pair[1])
         });
       })

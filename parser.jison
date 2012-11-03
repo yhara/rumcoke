@@ -64,6 +64,7 @@ rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 ".."  return "IDENT";
 {rmk_ident}"."{js_ident}         return "PROPREF";
 {js_ident}*":"                   return "KEYWORD";
+'"'[^"]*'":'                     return "STR_KEYWORD";
 {rmk_ident}                      return "IDENT";
 [0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
@@ -150,6 +151,7 @@ object
 
   keyword
     : KEYWORD { $$ = yytext.slice(0, -1); }
+    | STR_KEYWORD { $$ = yytext.slice(1, -2); }
     ;
 
 propref
