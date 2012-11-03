@@ -60,7 +60,7 @@ rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 "{}"  return "{}";
 "("   return "(";
 ")"   return ")";
-[-+*/%=^\|]  return "IDENT";
+[-+*/%=^\|~]  return "IDENT";
 ".."  return "IDENT";
 {rmk_ident}"."{js_ident}         return "PROPREF";
 {js_ident}*":"                   return "KEYWORD";

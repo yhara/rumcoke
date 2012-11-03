@@ -1,5 +1,4 @@
 ; vim: set ft=scheme:
-#|
 (define util (require "util"))
 (define fs (require "fs"))
 (define _ (require "underscore"))
@@ -30,7 +29,7 @@
   (define init (if (= rest.length 0)
                  null
                  (if (= rest.length 1)
-                   (convert-value (aref rest 0))
+                   (convert-value (~ rest 0))
                    (raise "malformed defvar" (receiver: receiver)))))
   (ast "VariableDeclaration"
        (kind: "var"
@@ -71,7 +70,7 @@
                                      (convert-stmt body-item)))))))))
 
 (define (convert-defun left rest)
-  (define fname (aref left 0))
+  (define fname (~ left 0))
   (define params (.. left (slice 1)))
   (raise-if (not (symbol? fname)) "malformed defun")
   
@@ -81,11 +80,31 @@
                             (id: (convert-node fname)
                              init: (functoin-with-return params (array) rest)))))))
 
-; ---
+(define syntaxes
+  (define: (^(v)
+    (define left (~ v 1))
+    (define rest (v.slice 2))
+    (if (symbol? left)
+      (convert-defvar left rest)
+      (if (_.isArray left)
+        (convert-defun left rest)
+        (raise "malformed define" (left: left rest: rest)))))))
+
+#|
+
+(_.each (array "+" "-" "*" "/")
+        (^(op)
+          (aset! syntaxes op 
+                 (^(v) 
+                   (ast "BinaryExpression"
+                     (operator: op
+                      left: (convert-value (~ v 1))
+                      right: (convert-value (~ v 2))))))))
+
+#|
 
 (define (convert-value v)
   (convert-node v #t))
-
 
 (define (convert-node v value-needed?)
   (if (or (_.isNumber v) (_.isString v) (_.isRegExp v)
@@ -102,22 +121,25 @@
           (if (_.isArray v)
             ; Application
             (begin
-              (define first (aref v 0))
+              (define first (~ v 0))
               (define rest (v.slice 1))
               (define conv (if (symbol? first)
-                             (aref syntaxes first.name)
+                             (~ syntaxes first.name)
                              #f))
               (if conv
                 (conv v value-needed?)
                 (ast "CallExpression"
-                  (callee: (convert-value (aref v 0))
+                  (callee: (convert-value (~ v 0))
                    arguments: (rest.map convert-value)))))
             ; Object
-            (ast "ObjectExpression" TODO)))))))
-
-|#
-
-#|
+            (ast "ObjectExpression" 
+              (properties: (_.map (_.pairs v)
+                                  (^(pair)
+                                    (ast "Property"
+                                      (kind: "init"
+                                       key: (ast "Identifier"
+                                              (name: (~ pair 0)))
+                                       value: (convert-value (~ pair 1))))))))))))))
 
 (exprs.forEach (^(expr)
                  (define ast (convert-node expr))

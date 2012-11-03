@@ -192,7 +192,7 @@ var syntaxes = {
       });
   },
 
-  "aref": function(v){
+  "~": function(v){
     // TODO: successive aref
     raiseIf(v.length !== 3, "malformed aref");
     return ast("MemberExpression", {
