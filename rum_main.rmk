@@ -9,10 +9,10 @@
 (define (symbol? x)
   (instance? x Parser.Symbol))
 
-(define exprs (parser.parse "77"))
+(define exprs (parser.parse (fs.readFileSync (~ process.argv 2) "utf8")))
 
-(util.puts (util.inspect exprs #f null #t))
-(util.puts "--")
+;(util.puts (util.inspect exprs #f null #t))
+;(util.puts "--")
 
 (define (raise msg info)
   (or info (set! info {}))
@@ -54,20 +54,22 @@
 (define (convert-stmt v)
   (statement-expr (convert-node v)))
 
-(define (functoin-with-return params-ary defaults body-exprs)
+(define (block-stmt-with-return body-exprs)
+  (ast "BlockStatement"
+    (body: (body-exprs.map (^(body-item idx)
+                             (if (= idx (- body-exprs.length 1))
+                               (ast "ReturnStatement"
+                                 (argument: (convert-value body-item)))
+                               (convert-stmt body-item)))))))
+
+(define (function-with-return params-ary defaults body-exprs)
   (ast "FunctionExpression"
        (params: (_.map params-ary
                        (^(param)
                          (raise-if (not (symbol? param)) "malformed defun param")
                          (convert-node param)))
         defaults: defaults
-        body: (ast "BlockStatement"
-                   (body: (_.map body-exprs
-                                 (^(body-item idx)
-                                   (if (= idx (- body-exprs.length 1))
-                                     (ast "ReturnStatement"
-                                          (argument: (convert-value body-item)))
-                                     (convert-stmt body-item)))))))))
+        body: (block-stmt-with-return body-exprs))))
 
 (define (convert-defun left rest)
   (define fname (~ left 0))
@@ -78,10 +80,10 @@
     (kind: "var"
      declarations: (array (ast "VariableDeclarator"
                             (id: (convert-node fname)
-                             init: (functoin-with-return params (array) rest)))))))
+                             init: (function-with-return params (array) rest)))))))
 
 (define syntaxes
-  (define: (^(v)
+  ("define": (^(v)
     (define left (~ v 1))
     (define rest (v.slice 2))
     (if (symbol? left)
@@ -102,9 +104,114 @@
           (computed: #f
            object: acc
            property: (convert-node call-spec)))
-        TODO))))))
+        (if (_.array? call-spec)
+          (begin
+            (raise-if (not (symbol? (~ call-spec 0)))
+                      "malformed .."
+                      (expected: "Symbol" given: (~ call-spec 0)))
+            (ast "CallExpression"
+              (callee: (ast "MemberExpression"
+                         (computed: #f
+                          object: acc
+                          property: (convert-node (~ call-spec 0))))
+               arguments: (_.map (call-spec.slice 1) convert-value))))
+          (raise "malformed ..")))
+      )
+      (convert-value receiver)))
 
-#|
+   "instance?": (^(v)
+     (ast "BinaryExpression"
+       (operator: "instanceof"
+        left: (convert-value (~ v 1))
+        right: (convert-value (~ v 2)))))
+
+   "set!": (^(v)
+     (ast "AssignmentExpression"
+       (operator: "="
+        left: (convert-value (~ v 1))
+        right: (convert-value (~ v 2)))))
+
+   "aset!": (^(v)
+     (ast "AssignmentExpression"
+       (operator: "="
+        left: (ast "MemberExpression"
+                (computed: #t
+                 object: (convert-value (~ v 1))
+                 property: (convert-value (~ v 2))))
+        right: (convert-value (~ v 3)))))
+
+   "~": (^(v)
+    (raise-if (not (= v.length 3)) "mailformed ~")
+    (ast "MemberExpression"
+      (computed: #t
+       object: (convert-value (~ v 1))
+       property: (convert-value (~ v 2)))))
+
+   "array": (^(v)
+     (ast "ArrayExpression"
+       (elements: (_.map (v.slice 1) convert-value))))
+
+   "=": (^(v)
+     (raise-if (not (= v.length 3)) "malformed =")
+     (ast "BinaryExpression"
+       (operator: "==="
+        left: (convert-value (~ v 1))
+        right: (convert-value (~ v 2)))))
+
+   "if": (^(v value-needed?)
+     (if value-needed?
+       (ast "ConditionalExpression"
+         (test: (convert-value (~ v 1))
+          consequent: (convert-value (~ v 2))
+          alternate: (convert-value (~ v 3))))
+       (ast "IfStatement"
+         (test: (convert-value (~ v 1))
+          consequent: (convert-value (~ v 2))
+          alternate: (convert-value (~ v 3))))))
+
+   "begin": (^(v value-needed?)
+     (if value-needed?
+       (ast "CallExpression"
+         (arguments: (array)
+          callee: (ast "FunctionExpression"
+                    (params: (array)
+                     defaults: (array)
+                     body: (block-stmt-with-return (v.slice 1))))))
+       (ast "BlockStatement"
+         (body: (_.map (v.slice 1) convert-stmt)))))
+
+   "or": (^(v)
+     (define rest (v.slice 1))
+     (if (= rest.length 0)
+       (ast "Literal" (value: #f))
+       (if (= rest.length 1)
+         (ast "LogicalExpression"
+           (operator: "||"
+            left: (convert-value (~ rest 0))
+            right: (ast "Literal" (value: #f))))
+         (_.reduce (rest.slice 1)
+                   (^(acc item)
+                     (ast "LogicalExpression"
+                          (operator: "||"
+                                     left: acc
+                                     right: (convert-value item))))
+                   (convert-value (~ rest 0))))))
+
+   "not": (^(v)
+     (raise-if (not (= v.length 2)) "malformed not")
+     (ast "UnaryExpression"
+       (operator: "!"
+        argument: (convert-value (~ v 1)))))
+
+   "throw": (^(v value-needed?)
+     (raise-if (not (= v.length 2)) "malformed throw")
+     (define throw-stmt (ast "ThrowStatement"
+                          (argument: (convert-value (~ v 1)))))
+     (if value-needed?
+       (wrap-with-function-call throw-stmt)
+       throw-stmt))
+
+   ))
 
 (_.each (array "+" "-" "*" "/")
         (^(op)
@@ -115,19 +222,18 @@
                       left: (convert-value (~ v 1))
                       right: (convert-value (~ v 2))))))))
 
-#|
-
 (define (convert-value v)
   (convert-node v #t))
 
 (define (convert-node v value-needed?)
   (if (or (_.number? v) (_.string? v) (_.reg-exp? v)
-            (_.boolean? v) (_.null? v))
+          (_.boolean? v) (_.null? v))
     (ast "Literal" (value: v))
     (if (_.undefined? v)
       (ast "UnaryExpression"
-        (operator: "void" argument: (ast "Literal" (value: 0))))
-      (if (_.empty?(v))
+        (operator: "void"
+         argument: (ast "Literal" (value: 0))))
+      (if (_.empty? v)
         ; TODO: Replace this with `(new Object)'
         (ast "ObjectExpression" (properties: (array)))
         (if (symbol? v)
@@ -151,12 +257,11 @@
                                   (^(pair)
                                     (ast "Property"
                                       (kind: "init"
-                                       key: (ast "Identifier"
-                                              (name: (~ pair 0)))
+                                       key: (ast "Literal"
+                                              (value: (~ pair 0)))
                                        value: (convert-value (~ pair 1))))))))))))))
 
 (exprs.forEach (^(expr)
                  (define ast (convert-node expr))
-                 ;(util.puts (util.inspect ast #f null #t))
+                 ;(util.puts (+ "ast: " (util.inspect ast #f null #t)))
                  (util.puts (escodegen.generate ast))))
-|#
