@@ -11,7 +11,8 @@ isSymbol = function(x){
   return x instanceof Parser.Symbol;
 }
 
-exprs = parser.parse(fs.readFileSync("rum_main.rmk", "utf8"));
+//exprs = parser.parse(fs.readFileSync("rum_main.rmk", "utf8"));
+exprs = parser.parse(fs.readFileSync(process.argv[2], "utf8"));
 //exprs = parser.parse("a.b");
 
 //util.puts(util.inspect(exprs, false, null, true));
@@ -194,7 +195,7 @@ var syntaxes = {
 
   "~": function(v){
     // TODO: successive aref
-    raiseIf(v.length !== 3, "malformed aref");
+    raiseIf(v.length !== 3, "malformed ~");
     return ast("MemberExpression", {
       computed: true,
       object: convertValue(v[1]),
