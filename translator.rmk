@@ -47,7 +47,7 @@
                                  (body: (array (statement-expr inner-ast)))))))))
 
 (define (statement-expr inner-ast)
-  (if (.. inner-ast type (match #/Expression$/))
+  (if (.. inner-ast type (match #/Literal|Expression$/))
     (ast "ExpressionStatement" (expression: inner-ast))
     inner-ast))
 
@@ -166,8 +166,8 @@
           alternate: (convert-value (~ v 3))))
        (ast "IfStatement"
          (test: (convert-value (~ v 1))
-          consequent: (convert-value (~ v 2))
-          alternate: (convert-value (~ v 3))))))
+          consequent: (convert-stmt (~ v 2))
+          alternate: (convert-stmt (~ v 3))))))
 
    "begin": (^(v value-needed?)
      (if value-needed?
