@@ -255,14 +255,26 @@ var convertNode = function (v, isValueNeeded) {
             });
         })});
 };
-var macros = {'when': function (v) {
+var quote = function (v) {
+    return isSymbol(v) ? [
+        Sym('Sym'),
+        v.name
+    ] : _.isArray(v) ? [Sym('array')].concat(_.map(v, quote)) : v;
+};
+var macros = {
+        'quote': function (v) {
+            raiseIf(!(v.length === 2), 'malformed quote');
+            return quote(v[1]);
+        },
+        'when': function (v) {
             return [
                 Sym('if'),
                 v[1],
                 [Sym('begin')].concat(v.slice(2)),
                 void 0
             ];
-        }};
+        }
+    };
 var expandMacros = function (v, mod) {
     mod || (mod = {});
     return _.isArray(v) ? function () {
