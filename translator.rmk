@@ -189,6 +189,12 @@
        (ast "BlockStatement"
          (body: (_.map (v.slice 1) convert-stmt)))))
 
+   "and": (^(v)
+     (ast "BinaryExpression"
+       (operator: "&&"
+        left: (convert-value (~ v 1))
+        right: (convert-value (~ v 2)))))
+
    "or": (^(v)
      (define rest (v.slice 1))
      (if (= rest.length 0)
