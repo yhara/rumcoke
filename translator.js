@@ -184,6 +184,13 @@ var syntaxes = {
                 })
             }) : ast('BlockStatement', {'body': _.map(v.slice(1), convertStmt)});
         },
+        'and': function (v) {
+            return ast('LogicalExpression', {
+                'operator': '&&',
+                'left': convertValue(v[1]),
+                'right': convertValue(v[2])
+            });
+        },
         'or': function (v) {
             var rest = v.slice(1);
             return rest.length === 0 ? ast('Literal', {'value': false}) : rest.length === 1 ? ast('LogicalExpression', {
@@ -282,3 +289,4 @@ var translate = function (exprs) {
     });
 };
 module.exports['translate'] = translate
+module.exports['convertNode'] = convertNode

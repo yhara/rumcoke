@@ -190,7 +190,7 @@
          (body: (_.map (v.slice 1) convert-stmt)))))
 
    "and": (^(v)
-     (ast "BinaryExpression"
+     (ast "LogicalExpression"
        (operator: "&&"
         left: (convert-value (~ v 1))
         right: (convert-value (~ v 2)))))
@@ -275,12 +275,35 @@
                                               (value: (~ pair 0)))
                                        value: (convert-value (~ pair 1))))))))))))))
 
+;(define (expand-qq v lv)
+;  (if (not (_.array? v))
+;    v
+;    (begin
+;      (define car (~ v 0))
+;      (if (and (_.array? car)
+;               (= (~ car 0) (Sym "unquote-splicing")))
+;        (begin
+;          ; ((unquote-splicing foo) bar baz)
+;          (set! lv (- lv 1))
+;          (if (= lv 0)
+;            ; [<append> foo (expand-qq [bar baz] lv+1)]
+;            (begin
+;              (define rest (expand-qq (v.slice 1) (+ lv 1)))
+;              ;(.. (array (~ car 1)) (concat rest))
+;              (array (Sym "..") 
+;                     (array (Sym "array") 
+
+
 ; Macro
 (define macros 
   ("when": (^(v)
     (array (Sym "if") (~ v 1)
              (.. (array (Sym "begin")) (concat (v.slice 2)))
-             undefined))))
+             undefined))
+
+;   "quasiquote": (^(v)
+;     (expand-qq v 0))
+  ))
    
 (define (expand-macros v mod)
   (or mod (set! mod {}))
@@ -316,3 +339,4 @@
                    (util.puts (escodegen.generate ast)))))
 
 (aset! module.exports "translate" translate)
+(aset! module.exports "convertNode" convert-node)

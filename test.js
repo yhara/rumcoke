@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+//
+// test.js
+//
+// $ node test.js
+// should show nothing.
+
+var util = require("util"),
+    fs = require("fs"),
+    _ = require("underscore"),
+    escodegen = require("escodegen"),
+    esprima = require("esprima"),
+    Parser = require("./parser"),
+    Translator = require("./translator");
+
+if(_.contains(process.argv, "--debug"))
+  Translator = require("./_translator");
+
+var d = function (header, x) {
+  util.puts(header + util.inspect(x, false, null, true));
+};
+
+function test(rum_code, js_code){
+  var expected_ast = esprima.parse(js_code)["body"][0];
+  if (expected_ast.type == "ExpressionStatement")
+    expected_ast = expected_ast.expression;
+
+  var rum_expr = Parser.parser.parse(rum_code)[0];
+  var given_ast = Translator.convertNode(rum_expr, false);
+
+  if (!_.isEqual(given_ast, expected_ast)){
+    d("Given: ", given_ast);
+    d("Expected: ", expected_ast);
+
+    throw("failed: `" + rum_code + "` != `" + js_code + "`");
+  }
+}
+
+test("(define a 1)", "var a = 1;");
+//test("(define (f) 1)", "var f = function(){ return 1; };");
+//test("((^(x) x))", "(function(x){ return x })()");
+test("(.. a b)", "a.b");
+test("(.. a (b 1))", "a.b(1)");
+test("(instance? x y)", "x instanceof y");
+test("(set! x 1)", "x = 1");
+test("(aset! x y 1)", "x[y] = 1");
+test("(~ a b)", "a[b]");
+test("(array 1 2)", "[1,2]");
+test("(= x 1)", "x === 1");
+//test("(if x y z)", "if(x) y; else z");
+//test("begin
+test("(and x y)", "x && y"); 
+test("(or)", "false"); 
+test("(or x)", "x || false"); 
+test("(or x y)", "x || y"); 
+test("(or x y z)", "x || y || z"); 
+test("(not x)", "!x");
+test("(throw x)", "throw x");
+test("(+ x y)", "x + y"); // TODO: multiple args
+test("(- x y)", "x - y");
+test("(* x y)", "x * y");
+test("(/ x y)", "x / y");
