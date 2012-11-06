@@ -9,6 +9,10 @@
 (define (symbol? x)
   (instance? x Parser.Symbol))
 
+(define (d x)
+  (util.puts "debug: " (util.inspect x #f null #t)))
+  ; util.inspect obj showHidden depth colors
+
 ;(define exprs (parser.parse (fs.readFileSync (~ process.argv 2) "utf8")))
 
 ;(util.puts (util.inspect exprs #f null #t))
