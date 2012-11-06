@@ -62,6 +62,7 @@ rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 "{}"  return "{}";
 "("   return "(";
 ")"   return ")";
+"'"   return "'";
 [-+*/%=^\|~]  return "IDENT";
 ".."  return "IDENT";
 {rmk_ident}"."{rmk_ident}         return "PROPREF";
@@ -103,6 +104,7 @@ expr
   | array
   | object
   | propref
+  | quoted
   ;
 
 ident
@@ -160,4 +162,9 @@ propref
   : PROPREF
     { var _tmp = yytext.match(/(.+)\.(.+)/);
       $$ = [Sym(".."), Sym(_tmp[1]), Sym(_tmp[2])]; }
+  ;
+
+quoted
+  : "'" ident
+    { $$ = [Sym("Sym"), $2.name]; }
   ;
