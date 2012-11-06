@@ -8,6 +8,9 @@ var util = require("util"),
     Translator = require("./translator");
 
 if(process.argv[2]) {
+  if(_.contains(process.argv, "--debug"))
+    Translator = require("./_translator");
+
   exprs = Parser.parser.parse(fs.readFileSync(process.argv[2], "utf8"));
   Translator.translate(exprs);
 }
