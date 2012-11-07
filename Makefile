@@ -11,7 +11,6 @@ parser.js: parser.jison
 
 accept: _translator.js
 	cp _translator.js translator.js
-	git add translator.rmk translator.js
 
 debug: _translator.js
 	./rumcoke a.rmk --debug
