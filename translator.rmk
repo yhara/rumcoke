@@ -369,15 +369,12 @@
         (if (~ syntaxes car.name)
           ; Special forms
           ; TODO: expand macro for each form
-          (if (= car 'define)
-            (append (array 'define (~ v 1))
+          (if (_.contains (array 'define '^) car)
+            (append (v.slice 0 2)
                     (_.map (v.slice 2) (^(x) (expand-macros x mod))))
-            (if (= car '^)
-              (append (array '^ (~ v 1))
-                      (_.map (v.slice 2) (^(x) (expand-macros x mod))))
-              (if (= car 'throw)
-                (array 'throw (expand-macros (~ v 1) mod))
-                v)))
+            (if (= car 'throw)
+              (array 'throw (expand-macros (~ v 1) mod))
+              v))
             ; TODO: .. set! aset! ~ array = if begin and or not while
           ; Not a special form
           (begin

@@ -310,15 +310,10 @@ var expandMacros = function (v, mod) {
     mod || (mod = {});
     return _.isArray(v) ? function () {
         var car = v[0];
-        return isSymbol(car) ? syntaxes[car.name] ? car === Sym('define') ? append([
+        return isSymbol(car) ? syntaxes[car.name] ? _.contains([
             Sym('define'),
-            v[1]
-        ], _.map(v.slice(2), function (x) {
-            return expandMacros(x, mod);
-        })) : car === Sym('^') ? append([
-            Sym('^'),
-            v[1]
-        ], _.map(v.slice(2), function (x) {
+            Sym('^')
+        ], car) ? append(v.slice(0, 2), _.map(v.slice(2), function (x) {
             return expandMacros(x, mod);
         })) : car === Sym('throw') ? [
             Sym('throw'),
