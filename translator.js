@@ -20,6 +20,9 @@ var raise = function (msg, info) {
 var raiseIf = function (cond, msg, info) {
     return cond ? raise(msg, info) : void 0;
 };
+var append = function (ary1, ary2) {
+    return ary1.concat(ary2);
+};
 var ast = function (typename, info) {
     info['type'] = typename;
     return info;
@@ -295,10 +298,10 @@ var expandMacros = function (v, mod) {
     mod || (mod = {});
     return _.isArray(v) ? function () {
         var car = v[0];
-        return isSymbol(car) ? syntaxes[car.name] ? car === Sym('define') ? [
+        return isSymbol(car) ? syntaxes[car.name] ? car === Sym('define') ? append([
             Sym('define'),
             v[1]
-        ].concat(_.map(v.slice(2), function (x) {
+        ], _.map(v.slice(2), function (x) {
             return expandMacros(x, mod);
         })) : v : function () {
             var macro = macros[car.name];

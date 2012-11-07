@@ -25,6 +25,9 @@
 (define (raise-if cond msg info)
   (if cond (raise msg info) undefined))
 
+(define (append ary1 ary2)
+  (.. ary1 (concat ary2)))
+
 (define (ast typename info)
   (aset! info "type" typename)
   info)
@@ -355,8 +358,10 @@
           ; Special forms
           ; TODO: expand macro for each form
           (if (= car 'define)
-            (.. (array 'define (~ v 1))
-                (concat (_.map (v.slice 2) (^(x) (expand-macros x mod)))))
+            (append (array 'define (~ v 1))
+                    (_.map (v.slice 2) (^(x) (expand-macros x mod))))
+;            (if (= car '^)
+;              (.. (array '^ (~ v 1))
             v)
           (begin
             (define macro (~ macros car.name))
