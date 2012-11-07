@@ -55,6 +55,8 @@ test("(or x)", "x || false");
 test("(or x y)", "x || y"); 
 test("(or x y z)", "x || y || z"); 
 test("(not x)", "!x");
+test("(while 1 (f))", "while(1){ f(); }");
+test("(while 1 (f) (g))", "while(1){ f(); g(); }");
 test("(throw x)", "throw x");
 test("(+ x y)", "x + y"); // TODO: multiple args
 test("(- x y)", "x - y");

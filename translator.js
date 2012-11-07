@@ -212,6 +212,13 @@ var syntaxes = {
                 'argument': convertValue(v[1])
             });
         },
+        'while': function (v, isValueNeeded) {
+            var whileStmt = ast('WhileStatement', {
+                    'test': convertValue(v[1]),
+                    'body': ast('BlockStatement', {'body': _.map(v.slice(2), convertStmt)})
+                });
+            return isValueNeeded ? wrapWithFunctionCall(whileStmt) : whileStmt;
+        },
         'throw': function (v, isValueNeeded) {
             raiseIf(!(v.length === 2), 'malformed throw');
             var throwStmt = ast('ThrowStatement', {'argument': convertValue(v[1])});

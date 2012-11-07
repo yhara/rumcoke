@@ -218,6 +218,16 @@
        (operator: "!"
         argument: (convert-value (~ v 1)))))
 
+   ; TODO: should `while` have value in RumCoke?
+   "while": (^(v value-needed?)
+     (define while-stmt (ast "WhileStatement"
+                          (test: (convert-value (~ v 1))
+                           body: (ast "BlockStatement"
+                                   (body: (_.map (v.slice 2) convert-stmt))))))
+     (if value-needed?
+       (wrap-with-function-call while-stmt)
+       while-stmt))
+
    "throw": (^(v value-needed?)
      (raise-if (not (= v.length 2)) "malformed throw")
      (define throw-stmt (ast "ThrowStatement"
