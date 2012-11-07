@@ -293,7 +293,16 @@ var expandMacros = function (v, mod) {
             var macro = macros[s.name];
             return macro ? function () {
                 mod['modified'] = true;
-                return macro(v);
+                var ret = macro(v);
+                var _mod = {};
+                while (true) {
+                    ret = expandMacros(ret, _mod);
+                    if (!_mod.modified)
+                        break;
+                    else
+                        false;
+                }
+                return ret;
             }() : v.map(function (x) {
                 return expandMacros(x, mod);
             });

@@ -344,8 +344,14 @@
             (if macro
               (begin ; Found macro usage
                 (aset! mod "modified" #t)
-                ; TODO: recursive
-                (macro v))
+                (define ret (macro v))
+                (define _mod {})
+                (while #t
+                  (set! ret (expand-macros ret _mod))
+                  (if (not _mod.modified)
+                    (break)
+                    #f))
+                ret)
               ; Normal funcall
               (v.map (^(x) (expand-macros x mod))))))
         ; Computed funcall
