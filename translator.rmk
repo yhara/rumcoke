@@ -46,12 +46,12 @@
 
 (define (wrap-with-function-call inner-ast)
   (ast "CallExpression"
-       (arguments: (array)
-        callee: (ast "FunctionExpression"
-                     (params: (array)
-                      defaults: (array)
-                      body: (ast "BlockStatement"
-                                 (body: (array (statement-expr inner-ast)))))))))
+    (arguments: (array)
+     callee: (ast "FunctionExpression"
+               (params: (array)
+                defaults: (array)
+                body: (ast "BlockStatement"
+                        (body: (array (statement-expr inner-ast)))))))))
 
 (define (statement-expr inner-ast)
   (if (.. inner-ast type (match #/Literal|Expression$/))
@@ -71,12 +71,12 @@
 
 (define (function-with-return params-ary defaults body-exprs)
   (ast "FunctionExpression"
-       (params: (_.map params-ary
-                       (^(param)
-                         (raise-if (not (symbol? param)) "malformed defun param")
-                         (convert-node param)))
-        defaults: defaults
-        body: (block-stmt-with-return body-exprs))))
+    (params: (_.map params-ary
+                    (^(param)
+                      (raise-if (not (symbol? param)) "malformed defun param")
+                      (convert-node param)))
+     defaults: defaults
+     body: (block-stmt-with-return body-exprs))))
 
 (define (convert-defun left rest)
   (define fname (~ left 0))
