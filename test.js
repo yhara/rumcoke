@@ -61,7 +61,7 @@ test("(while 1 (f) (g))", "while(1){ f(); g(); }");
 test("(while 1 (break))", "while(1){ break }");
 test("(throw x)", "throw x");
 
-test('(js-ast "Literal" (value: 7))', "7");
+test('(raw-js-ast (type: "Literal" value: 7))', "7");
 
 test("(+ x y)", "x + y"); // TODO: multiple args
 test("(- x y)", "x - y");

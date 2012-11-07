@@ -218,9 +218,9 @@ var syntaxes = {
             var throwStmt = ast('ThrowStatement', {'argument': convertValue(v[1])});
             return isValueNeeded ? wrapWithFunctionCall(throwStmt) : throwStmt;
         },
-        'js-ast': function (v) {
-            raiseIf(!(v.length === 3), 'malformed js-ast');
-            return ast(v[1], v[2]);
+        'raw-js-ast': function (v) {
+            raiseIf(!(v.length === 2), 'malformed raw-js-ast');
+            return v[1];
         }
     };
 _.each([
@@ -274,13 +274,12 @@ var macros = {
         'instance?': function (v) {
             raiseIf(!(v.length === 3), 'malformed instance?');
             return [
-                Sym('js-ast'),
-                'BinaryExpression',
-                {
+                Sym('raw-js-ast'),
+                ast('BinaryExpression', {
                     'operator': 'instanceof',
                     'left': translateExpr(v[1]),
                     'right': translateExpr(v[2])
-                }
+                })
             ];
         },
         'when': function (v) {

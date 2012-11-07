@@ -232,9 +232,9 @@
        (wrap-with-function-call throw-stmt)
        throw-stmt))
 
-   "js-ast": (^(v)
-     (raise-if (not (= v.length 3)) "malformed js-ast")
-     (ast (~ v 1) (~ v 2)))
+   "raw-js-ast": (^(v)
+     (raise-if (not (= v.length 2)) "malformed raw-js-ast")
+     (~ v 1))
    ))
 
 (_.each (array "+" "-" "*" "/")
@@ -318,10 +318,16 @@
 
   "instance?": (^(v)
     (raise-if (not (= v.length 3)) "malformed instance?")
-    (array 'js-ast "BinaryExpression"
-      (operator: "instanceof"
-       left: (translate-expr (~ v 1))
-       right: (translate-expr (~ v 2)))))
+    (array 'raw-js-ast 
+      (ast "BinaryExpression"
+        (operator: "instanceof"
+         left: (translate-expr (~ v 1))
+         right: (translate-expr (~ v 2))))))
+
+  ; (case a         switch(a){
+  ;   ((b c) d e)     case b: case c: d; return d; break;
+  ;   (else e))       default: return e;
+  ;"case": (^(v)
 
   "when": (^(v)
     (array 'if (~ v 1)
