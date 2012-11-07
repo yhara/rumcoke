@@ -228,6 +228,9 @@
        (wrap-with-function-call while-stmt)
        while-stmt))
 
+   "break": (^(v)
+     (ast "BreakStatement" (label: null)))
+
    "throw": (^(v value-needed?)
      (raise-if (not (= v.length 2)) "malformed throw")
      (define throw-stmt (ast "ThrowStatement"
@@ -316,6 +319,7 @@
   ("quote": (^(v) 
     (raise-if (not (= v.length 2)) "malformed quote")
     (quote (~ v 1)))
+
    "when": (^(v)
     (array 'if (~ v 1)
              (.. (array 'begin) (concat (v.slice 2)))

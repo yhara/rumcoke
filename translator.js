@@ -219,6 +219,9 @@ var syntaxes = {
                 });
             return isValueNeeded ? wrapWithFunctionCall(whileStmt) : whileStmt;
         },
+        'break': function (v) {
+            return ast('BreakStatement', {'label': null});
+        },
         'throw': function (v, isValueNeeded) {
             raiseIf(!(v.length === 2), 'malformed throw');
             var throwStmt = ast('ThrowStatement', {'argument': convertValue(v[1])});
