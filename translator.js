@@ -6,9 +6,7 @@ var escodegen = require('escodegen');
 var Parser = require('./parser');
 var parser = Parser.parser;
 var Sym = Parser.Sym;
-var isSymbol = function (x) {
-    return x instanceof Parser.Symbol;
-};
+var isSymbol = Parser.isSymbol;
 var d = function (x) {
     return util.puts('debug: ', util.inspect(x, false, null, true));
 };

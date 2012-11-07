@@ -7,8 +7,7 @@
 (define Parser (require "./parser"))
 (define parser Parser.parser)
 (define Sym Parser.Sym)
-(define (symbol? x)
-  (instance? x Parser.Symbol))
+(define symbol? Parser.isSymbol)
 
 (define (d x)
   (util.puts "debug: " (util.inspect x #f null #t)))

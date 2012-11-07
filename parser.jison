@@ -27,6 +27,7 @@ Sym = function(name){
 };
 exports.Sym = Sym;
 exports.Symbol = Symbol;
+exports.isSymbol = function(x){ return x instanceof Symbol; };
 
 %}
 
