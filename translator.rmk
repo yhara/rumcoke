@@ -360,9 +360,11 @@
           (if (= car 'define)
             (append (array 'define (~ v 1))
                     (_.map (v.slice 2) (^(x) (expand-macros x mod))))
-;            (if (= car '^)
-;              (.. (array '^ (~ v 1))
-            v)
+            (if (= car '^)
+              (append (array '^ (~ v 1))
+                      (_.map (v.slice 2) (^(x) (expand-macros x mod))))
+              v))
+          ; Not a special form
           (begin
             (define macro (~ macros car.name))
             (if macro

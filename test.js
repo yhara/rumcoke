@@ -69,8 +69,9 @@ test("(* x y)", "x * y");
 test("(/ x y)", "x / y");
 
 // Macro expansion
-// macro inside define
+// macro inside special forms
 test("(define x (quote x))", "var x = Sym('x')");
+//test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
 
 // Macros
 test("(quote x)", "Sym('x')");
