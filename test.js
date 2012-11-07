@@ -38,8 +38,8 @@ function test(rum_code, js_code){
 }
 
 test("(define a 1)", "var a = 1;");
-//test("(define (f) 1)", "var f = function(){ return 1; };");
-//test("((^(x) x))", "(function(x){ return x })()");
+test("(define (f) 1)", "var f = function(){ return 1; };");
+test("((^(x) x))", "(function(x){ return x })()");
 test("(.. a b)", "a.b");
 test("(.. a (b 1))", "a.b(1)");
 test("(set! x 1)", "x = 1");
@@ -71,7 +71,7 @@ test("(/ x y)", "x / y");
 // Macro expansion
 // macro inside special forms
 test("(define x (quote x))", "var x = Sym('x')");
-//test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
+test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
 
 // Macros
 test("(quote x)", "Sym('x')");

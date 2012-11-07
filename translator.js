@@ -43,7 +43,11 @@ var wrapWithFunctionCall = function (innerAst) {
         'callee': ast('FunctionExpression', {
             'params': [],
             'defaults': [],
-            'body': ast('BlockStatement', {'body': [statementExpr(innerAst)]})
+            'body': ast('BlockStatement', {'body': [statementExpr(innerAst)]}),
+            'id': null,
+            'rest': null,
+            'generator': false,
+            'expression': false
         })
     });
 };
@@ -65,7 +69,11 @@ var functionWithReturn = function (paramsAry, defaults, bodyExprs) {
             return convertNode(param);
         }),
         'defaults': defaults,
-        'body': blockStmtWithReturn(bodyExprs)
+        'body': blockStmtWithReturn(bodyExprs),
+        'id': null,
+        'rest': null,
+        'generator': false,
+        'expression': false
     });
 };
 var convertDefun = function (left, rest) {
@@ -174,7 +182,11 @@ var syntaxes = {
                 'callee': ast('FunctionExpression', {
                     'params': [],
                     'defaults': [],
-                    'body': blockStmtWithReturn(v.slice(1))
+                    'body': blockStmtWithReturn(v.slice(1)),
+                    'id': null,
+                    'rest': null,
+                    'generator': false,
+                    'expression': false
                 })
             }) : ast('BlockStatement', {'body': _.map(v.slice(1), convertStmt)});
         },

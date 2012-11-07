@@ -51,7 +51,11 @@
                (params: (array)
                 defaults: (array)
                 body: (ast "BlockStatement"
-                        (body: (array (statement-expr inner-ast)))))))))
+                        (body: (array (statement-expr inner-ast))))
+                id: null
+                rest: null
+                generator: #f
+                expression: #f)))))
 
 (define (statement-expr inner-ast)
   (if (.. inner-ast type (match #/Literal|Expression$/))
@@ -76,7 +80,11 @@
                       (raise-if (not (symbol? param)) "malformed defun param")
                       (convert-node param)))
      defaults: defaults
-     body: (block-stmt-with-return body-exprs))))
+     body: (block-stmt-with-return body-exprs)
+     id: null
+     rest: null
+     generator: #f
+     expression: #f)))
 
 (define (convert-defun left rest)
   (define fname (~ left 0))
@@ -181,7 +189,11 @@
           callee: (ast "FunctionExpression"
                     (params: (array)
                      defaults: (array)
-                     body: (block-stmt-with-return (v.slice 1))))))
+                     body: (block-stmt-with-return (v.slice 1))
+                     id: null
+                     rest: null
+                     generator: #f
+                     expression: #f))))
        (ast "BlockStatement"
          (body: (_.map (v.slice 1) convert-stmt)))))
 
