@@ -226,6 +226,10 @@ var syntaxes = {
             raiseIf(!(v.length === 2), 'malformed throw');
             var throwStmt = ast('ThrowStatement', {'argument': convertValue(v[1])});
             return isValueNeeded ? wrapWithFunctionCall(throwStmt) : throwStmt;
+        },
+        'js-ast': function (v) {
+            raiseIf(!(v.length === 3), 'malformed js-ast');
+            return ast(v[1], v[2]);
         }
     };
 _.each([

@@ -238,6 +238,10 @@
      (if value-needed?
        (wrap-with-function-call throw-stmt)
        throw-stmt))
+
+   "js-ast": (^(v)
+     (raise-if (not (= v.length 3)) "malformed js-ast")
+     (ast (~ v 1) (~ v 2)))
    ))
 
 (_.each (array "+" "-" "*" "/")
