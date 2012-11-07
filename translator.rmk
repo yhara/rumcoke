@@ -328,6 +328,13 @@
   ;   ((b c) d e)     case b: case c: d; return d; break;
   ;   (else e))       default: return e;
   ;"case": (^(v)
+  ;  (array 'raw-js-ast
+  ;    (ast "SwitchStatement"
+  ;      (discriminant: (translate-expr (~ v 1))
+  ;       cases: (_.map (v.slice 2) (^(clause)
+  ;         (ast "SwitchCase"
+  ;           (test: 
+  ;            consequent: 
 
   "when": (^(v)
     (array 'if (~ v 1)
