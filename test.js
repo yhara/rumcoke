@@ -26,7 +26,7 @@ function test(rum_code, js_code){
     expected_ast = expected_ast.expression;
 
   var rum_expr = Parser.parser.parse(rum_code)[0];
-  var given_ast = Translator.convertNode(rum_expr, false);
+  var given_ast = Translator.translateExpr(rum_expr);
 
   if (!_.isEqual(given_ast, expected_ast)){
     d("Given: ", given_ast);
@@ -46,8 +46,9 @@ test("(set! x 1)", "x = 1");
 test("(aset! x y 1)", "x[y] = 1");
 test("(~ a b)", "a[b]");
 test("(array 1 2)", "[1,2]");
+// test(quote
 test("(= x 1)", "x === 1");
-//test("(if x y z)", "if(x) y; else z");
+//test("(if x y z)", "if(x) y; else z"); // TODO: bug?
 //test("begin
 test("(and x y)", "x && y"); 
 test("(or)", "false"); 
@@ -63,3 +64,6 @@ test("(+ x y)", "x + y"); // TODO: multiple args
 test("(- x y)", "x - y");
 test("(* x y)", "x * y");
 test("(/ x y)", "x / y");
+
+test("(quote x)", "Sym('x')");
+test("(quote (x y))", "[Sym('x'), Sym('y')]");
