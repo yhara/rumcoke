@@ -124,12 +124,6 @@
       )
       (convert-value receiver)))
 
-   "instance?": (^(v)
-     (ast "BinaryExpression"
-       (operator: "instanceof"
-        left: (convert-value (~ v 1))
-        right: (convert-value (~ v 2)))))
-
    "set!": (^(v)
      (ast "AssignmentExpression"
        (operator: "="
@@ -324,7 +318,14 @@
     (raise-if (not (= v.length 2)) "malformed quote")
     (quote (~ v 1)))
 
-   "when": (^(v)
+  "instance?": (^(v)
+    (raise-if (not (= v.length 3)) "malformed quote")
+    (array 'js-ast "BinaryExpression"
+      (operator: "instanceof"
+       left: (translate-expr (~ v 1))
+       right: (translate-expr (~ v 2)))))
+
+  "when": (^(v)
     (array 'if (~ v 1)
              (.. (array 'begin) (concat (v.slice 2)))
              undefined))

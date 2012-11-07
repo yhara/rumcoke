@@ -116,13 +116,6 @@ var syntaxes = {
                 }() : raise('malformed ..');
             }, convertValue(receiver));
         },
-        'instance?': function (v) {
-            return ast('BinaryExpression', {
-                'operator': 'instanceof',
-                'left': convertValue(v[1]),
-                'right': convertValue(v[2])
-            });
-        },
         'set!': function (v) {
             return ast('AssignmentExpression', {
                 'operator': '=',
@@ -279,6 +272,18 @@ var macros = {
         'quote': function (v) {
             raiseIf(!(v.length === 2), 'malformed quote');
             return quote(v[1]);
+        },
+        'instance?': function (v) {
+            raiseIf(!(v.length === 3), 'malformed quote');
+            return [
+                Sym('js-ast'),
+                'BinaryExpression',
+                {
+                    'operator': 'instanceof',
+                    'left': translateExpr(v[1]),
+                    'right': translateExpr(v[2])
+                }
+            ];
         },
         'when': function (v) {
             return [

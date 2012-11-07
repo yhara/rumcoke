@@ -42,7 +42,6 @@ test("(define a 1)", "var a = 1;");
 //test("((^(x) x))", "(function(x){ return x })()");
 test("(.. a b)", "a.b");
 test("(.. a (b 1))", "a.b(1)");
-test("(instance? x y)", "x instanceof y");
 test("(set! x 1)", "x = 1");
 test("(aset! x y 1)", "x[y] = 1");
 test("(~ a b)", "a[b]");
@@ -71,4 +70,6 @@ test("(/ x y)", "x / y");
 
 test("(quote x)", "Sym('x')");
 test("(quote (x y))", "[Sym('x'), Sym('y')]");
+test("(instance? x y)", "x instanceof y");
+test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 //test("(when x y z)", "if(x){ y; z; }");
