@@ -295,9 +295,14 @@ var macros = {
 var expandMacros = function (v, mod) {
     mod || (mod = {});
     return _.isArray(v) ? function () {
-        var s = v[0];
-        return isSymbol(s) ? syntaxes[s.name] ? v : function () {
-            var macro = macros[s.name];
+        var car = v[0];
+        return isSymbol(car) ? syntaxes[car.name] ? car === Sym('define') ? [
+            Sym('define'),
+            v[1]
+        ].concat(_.map(v.slice(2), function (x) {
+            return expandMacros(x, mod);
+        })) : v : function () {
+            var macro = macros[car.name];
             return macro ? function () {
                 mod['modified'] = true;
                 var ret = macro(v);

@@ -291,16 +291,15 @@
 ;    (begin
 ;      (define car (~ v 0))
 ;      (if (and (_.array? car)
-;               (= (~ car 0) (Sym "unquote-splicing")))
-;        (begin
-;          ; ((unquote-splicing foo) bar baz)
+;               (= (~ car 0) 'unquote-splicing))
+;        (begin ; ((unquote-splicing foo) bar baz)
 ;          (set! lv (- lv 1))
 ;          (if (= lv 0)
 ;            ; [<append> foo (expand-qq [bar baz] lv+1)]
 ;            (begin
 ;              (define rest (expand-qq (v.slice 1) (+ lv 1)))
 ;              ;(.. (array (~ car 1)) (concat rest))
-;              (array (Sym "..") 
+;              (array '..
 ;                     (array (Sym "array") 
 
 (define (quote v)
@@ -337,14 +336,17 @@
   (or mod (set! mod {}))
   (if (_.array? v)
     (begin
-      (define s (~ v 0))
-      (if (symbol? s)
-        (if (~ syntaxes s.name)
+      (define car (~ v 0))
+      (if (symbol? car)
+        (if (~ syntaxes car.name)
           ; Special forms
           ; TODO: expand macro for each form
-          v
+          (if (= car 'define)
+            (.. (array 'define (~ v 1))
+                (concat (_.map (v.slice 2) (^(x) (expand-macros x mod)))))
+            v)
           (begin
-            (define macro (~ macros s.name))
+            (define macro (~ macros car.name))
             (if macro
               (begin ; Found macro usage
                 (aset! mod "modified" #t)

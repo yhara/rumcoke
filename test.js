@@ -68,8 +68,14 @@ test("(- x y)", "x - y");
 test("(* x y)", "x * y");
 test("(/ x y)", "x / y");
 
+// Macro expansion
+// macro inside define
+test("(define x (quote x))", "var x = Sym('x')");
+
+// Macros
 test("(quote x)", "Sym('x')");
 test("(quote (x y))", "[Sym('x'), Sym('y')]");
 test("(instance? x y)", "x instanceof y");
 test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 //test("(when x y z)", "if(x){ y; z; }");
+
