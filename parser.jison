@@ -169,3 +169,10 @@ quoted
   : "'" ident
     { $$ = [Sym("Sym"), $2.name]; }
   ;
+
+/*
+quoted
+  : "'" expr
+    { $$ = [Sym("quote"), $2]; }
+  ;
+*/
