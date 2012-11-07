@@ -29,8 +29,9 @@ function test(rum_code, js_code){
   var given_ast = Translator.translateExpr(rum_expr);
 
   if (!_.isEqual(given_ast, expected_ast)){
-    d("Given: ", given_ast);
     d("Expected: ", expected_ast);
+    util.puts("");
+    d("Actual: ", given_ast);
 
     throw("failed: `" + rum_code + "` != `" + js_code + "`");
   }
@@ -67,3 +68,4 @@ test("(/ x y)", "x / y");
 
 test("(quote x)", "Sym('x')");
 test("(quote (x y))", "[Sym('x'), Sym('y')]");
+//test("(when x y z)", "if(x){ y; z; }");
