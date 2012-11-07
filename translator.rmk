@@ -318,7 +318,7 @@
     (quote (~ v 1)))
 
   "instance?": (^(v)
-    (raise-if (not (= v.length 3)) "malformed quote")
+    (raise-if (not (= v.length 3)) "malformed instance?")
     (array 'js-ast "BinaryExpression"
       (operator: "instanceof"
        left: (translate-expr (~ v 1))

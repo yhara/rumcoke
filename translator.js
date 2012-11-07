@@ -272,7 +272,7 @@ var macros = {
             return quote(v[1]);
         },
         'instance?': function (v) {
-            raiseIf(!(v.length === 3), 'malformed quote');
+            raiseIf(!(v.length === 3), 'malformed instance?');
             return [
                 Sym('js-ast'),
                 'BinaryExpression',
