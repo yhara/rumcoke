@@ -375,7 +375,10 @@
             (if (= car '^)
               (append (array '^ (~ v 1))
                       (_.map (v.slice 2) (^(x) (expand-macros x mod))))
-              v))
+              (if (= car 'throw)
+                (array 'throw (expand-macros (~ v 1) mod))
+                v)))
+            ; TODO: .. set! aset! ~ array = if begin and or not while
           ; Not a special form
           (begin
             (define macro (~ macros car.name))

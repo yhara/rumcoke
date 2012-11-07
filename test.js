@@ -72,6 +72,7 @@ test("(/ x y)", "x / y");
 // macro inside special forms
 test("(define x (quote x))", "var x = Sym('x')");
 test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
+test("(throw (quote x))", "throw(Sym('x'))");
 
 // Macros
 test("(quote x)", "Sym('x')");

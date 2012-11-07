@@ -320,7 +320,10 @@ var expandMacros = function (v, mod) {
             v[1]
         ], _.map(v.slice(2), function (x) {
             return expandMacros(x, mod);
-        })) : v : function () {
+        })) : car === Sym('throw') ? [
+            Sym('throw'),
+            expandMacros(v[1], mod)
+        ] : v : function () {
             var macro = macros[car.name];
             return macro ? function () {
                 mod['modified'] = true;
