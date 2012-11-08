@@ -282,7 +282,7 @@ var quote = function (v) {
     return isSymbol(v) ? [
         Sym('Sym'),
         v.name
-    ] : _.isArray(v) ? [Sym('array')].concat(_.map(v, quote)) : v;
+    ] : _.isArray(v) ? cons(Sym('array'), _.map(v, quote)) : v;
 };
 var macros = {
         'quote': function (v) {
@@ -304,7 +304,7 @@ var macros = {
             return [
                 Sym('if'),
                 v[1],
-                [Sym('begin')].concat(v.slice(2)),
+                cons(Sym('begin'), v.slice(2)),
                 void 0
             ];
         }

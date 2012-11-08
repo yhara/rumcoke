@@ -324,8 +324,7 @@
   (if (symbol? v)
     (array 'Sym v.name)
     (if (_.array? v)
-      (.. (array 'array)
-          (concat (_.map v quote)))
+      (cons 'array (_.map v quote))
       v)))
 
 ; Macro
@@ -355,9 +354,10 @@
   ;            consequent: 
 
   "when": (^(v)
-    (array 'if (~ v 1)
-             (.. (array 'begin) (concat (v.slice 2)))
-             undefined))
+    (array 'if
+           (~ v 1)
+           (cons 'begin (v.slice 2))
+           undefined))
 
 ;   "quasiquote": (^(v)
 ;     (expand-qq v 0))
