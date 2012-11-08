@@ -321,7 +321,13 @@ var expandMacros = function (v, mod) {
             Sym('throw'),
             Sym('not'),
             Sym('and'),
-            Sym('or')
+            Sym('or'),
+            Sym('~'),
+            Sym('array'),
+            Sym('='),
+            Sym('if'),
+            Sym('begin'),
+            Sym('while')
         ], car) ? _.map(v, function (x) {
             return expandMacros(x, mod);
         }) : v : function () {
