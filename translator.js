@@ -319,11 +319,12 @@ var expandMacros = function (v, mod) {
             return expandMacros(x, mod);
         })) : _.contains([
             Sym('throw'),
-            Sym('not')
-        ], car) ? [
-            v[0],
-            expandMacros(v[1], mod)
-        ] : v : function () {
+            Sym('not'),
+            Sym('and'),
+            Sym('or')
+        ], car) ? _.map(v, function (x) {
+            return expandMacros(x, mod);
+        }) : v : function () {
             var macro = macros[car.name];
             return macro ? function () {
                 mod['modified'] = true;

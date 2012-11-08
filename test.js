@@ -74,6 +74,8 @@ test("(define x (quote x))", "var x = Sym('x')");
 test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
 test("(set! x (quote x))", "x = Sym('x')");
 test("(aset! x (quote x) y)", "x[Sym('x')] = y");
+test("(and (quote x) y)", "Sym('x') && y");
+test("(or (quote x) y)", "Sym('x') || y");
 test("(not (quote x))", "!Sym('x')");
 test("(throw (quote x))", "throw(Sym('x'))");
 
