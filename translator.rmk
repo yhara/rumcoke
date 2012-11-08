@@ -372,8 +372,8 @@
           (if (_.contains (array 'define '^ 'set! 'aset!) car)
             (append (v.slice 0 2)
                     (_.map (v.slice 2) (^(x) (expand-macros x mod))))
-            (if (= car 'throw)
-              (array 'throw (expand-macros (~ v 1) mod))
+            (if (_.contains (array 'throw 'not) car)
+              (array (~ v 0) (expand-macros (~ v 1) mod))
               v))
             ; TODO: .. set! aset! ~ array = if begin and or not while
           ; Not a special form

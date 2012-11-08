@@ -317,8 +317,11 @@ var expandMacros = function (v, mod) {
             Sym('aset!')
         ], car) ? append(v.slice(0, 2), _.map(v.slice(2), function (x) {
             return expandMacros(x, mod);
-        })) : car === Sym('throw') ? [
+        })) : _.contains([
             Sym('throw'),
+            Sym('not')
+        ], car) ? [
+            v[0],
             expandMacros(v[1], mod)
         ] : v : function () {
             var macro = macros[car.name];
