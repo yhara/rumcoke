@@ -365,6 +365,8 @@
    
 (define (expand-macros v mod)
   (or mod (set! mod {}))
+  (define (expand-inner x)
+    (expand-macros x mod))
   (if (_.array? v)
     (begin
       (define car (~ v 0))
@@ -373,10 +375,10 @@
           ; Special forms
           (if (_.contains (array 'define '^ 'set! 'aset!) car)
             (append (v.slice 0 2)
-                    (_.map (v.slice 2) (^(x) (expand-macros x mod))))
+                    (_.map (v.slice 2) expand-inner))
             (if (_.contains (array 'throw 'not 'and 'or '~ 'array
                                    '= 'if 'begin 'while) car)
-              (_.map v (^(x) (expand-macros x mod)))
+              (v.map expand-inner)
               (if (= '.. car)
                 (append (array '.. (expand-macros (~ v 1) mod))
                   (_.map (v.slice 2) (^(c)
@@ -384,7 +386,7 @@
                       (expand-macros c mod)
                       (if (_.array? c)
                         (cons (~ c 0)
-                          (_.map (c.slice 1) (^(x) (expand-macros x mod))))
+                          (_.map (c.slice 1) expand-inner))
                         (raise "malformed .."))))))
                 v)))
           ; Not a special form
@@ -402,9 +404,9 @@
                     #f))
                 ret)
               ; Normal funcall
-              (v.map (^(x) (expand-macros x mod))))))
+              (v.map expand-inner))))
         ; Computed funcall
-        (v.map (^(x) (expand-macros x mod)))))
+        (v.map expand-inner)))
     ; Literal
     v))
 

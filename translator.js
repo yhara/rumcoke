@@ -311,6 +311,9 @@ var macros = {
     };
 var expandMacros = function (v, mod) {
     mod || (mod = {});
+    var expandInner = function (x) {
+        return expandMacros(x, mod);
+    };
     return _.isArray(v) ? function () {
         var car = v[0];
         return isSymbol(car) ? syntaxes[car.name] ? _.contains([
@@ -318,9 +321,7 @@ var expandMacros = function (v, mod) {
             Sym('^'),
             Sym('set!'),
             Sym('aset!')
-        ], car) ? append(v.slice(0, 2), _.map(v.slice(2), function (x) {
-            return expandMacros(x, mod);
-        })) : _.contains([
+        ], car) ? append(v.slice(0, 2), _.map(v.slice(2), expandInner)) : _.contains([
             Sym('throw'),
             Sym('not'),
             Sym('and'),
@@ -331,15 +332,11 @@ var expandMacros = function (v, mod) {
             Sym('if'),
             Sym('begin'),
             Sym('while')
-        ], car) ? _.map(v, function (x) {
-            return expandMacros(x, mod);
-        }) : Sym('..') === car ? append([
+        ], car) ? v.map(expandInner) : Sym('..') === car ? append([
             Sym('..'),
             expandMacros(v[1], mod)
         ], _.map(v.slice(2), function (c) {
-            return isSymbol(c) ? expandMacros(c, mod) : _.isArray(c) ? cons(c[0], _.map(c.slice(1), function (x) {
-                return expandMacros(x, mod);
-            })) : raise('malformed ..');
+            return isSymbol(c) ? expandMacros(c, mod) : _.isArray(c) ? cons(c[0], _.map(c.slice(1), expandInner)) : raise('malformed ..');
         })) : v : function () {
             var macro = macros[car.name];
             return macro ? function () {
@@ -354,12 +351,8 @@ var expandMacros = function (v, mod) {
                         false;
                 }
                 return ret;
-            }() : v.map(function (x) {
-                return expandMacros(x, mod);
-            });
-        }() : v.map(function (x) {
-            return expandMacros(x, mod);
-        });
+            }() : v.map(expandInner);
+        }() : v.map(expandInner);
     }() : v;
 };
 var debug = false;
