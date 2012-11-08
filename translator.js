@@ -23,6 +23,9 @@ var raiseIf = function (cond, msg, info) {
 var append = function (ary1, ary2) {
     return ary1.concat(ary2);
 };
+var cons = function (obj, ary) {
+    return append([obj], ary);
+};
 var ast = function (typename, info) {
     info['type'] = typename;
     return info;
@@ -330,7 +333,14 @@ var expandMacros = function (v, mod) {
             Sym('while')
         ], car) ? _.map(v, function (x) {
             return expandMacros(x, mod);
-        }) : v : function () {
+        }) : Sym('..') === car ? append([
+            Sym('..'),
+            expandMacros(v[1], mod)
+        ], _.map(v.slice(2), function (c) {
+            return isSymbol(c) ? expandMacros(c, mod) : _.isArray(c) ? cons(c[0], _.map(c.slice(1), function (x) {
+                return expandMacros(x, mod);
+            })) : raise('malformed ..');
+        })) : v : function () {
             var macro = macros[car.name];
             return macro ? function () {
                 mod['modified'] = true;

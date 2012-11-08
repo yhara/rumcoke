@@ -71,7 +71,8 @@ test("(/ x y)", "x / y");
 // Macro expansion
 // macro inside special forms
 test("(define x (quote x))", "var x = Sym('x')");
-//..
+test("(.. (quote x) y)", "Sym('x').y");
+test("(.. (quote x) (y (quote z)))", "Sym('x').y(Sym('z'))");
 test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
 test("(set! x (quote x))", "x = Sym('x')");
 test("(aset! x (quote x) y)", "x[Sym('x')] = y");

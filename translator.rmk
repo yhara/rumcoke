@@ -28,6 +28,9 @@
 (define (append ary1 ary2)
   (.. ary1 (concat ary2)))
 
+(define (cons obj ary)
+  (append (array obj) ary))
+
 (define (ast typename info)
   (aset! info "type" typename)
   info)
@@ -368,15 +371,22 @@
       (if (symbol? car)
         (if (~ syntaxes car.name)
           ; Special forms
-          ; TODO: expand macro for each form
           (if (_.contains (array 'define '^ 'set! 'aset!) car)
             (append (v.slice 0 2)
                     (_.map (v.slice 2) (^(x) (expand-macros x mod))))
             (if (_.contains (array 'throw 'not 'and 'or '~ 'array
                                    '= 'if 'begin 'while) car)
               (_.map v (^(x) (expand-macros x mod)))
-              v))
-            ; TODO: .. set! aset! ~ array = if begin and or not while
+              (if (= '.. car)
+                (append (array '.. (expand-macros (~ v 1) mod))
+                  (_.map (v.slice 2) (^(c)
+                    (if (symbol? c)
+                      (expand-macros c mod)
+                      (if (_.array? c)
+                        (cons (~ c 0)
+                          (_.map (c.slice 1) (^(x) (expand-macros x mod))))
+                        (raise "malformed .."))))))
+                v)))
           ; Not a special form
           (begin
             (define macro (~ macros car.name))
