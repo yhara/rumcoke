@@ -312,7 +312,9 @@ var expandMacros = function (v, mod) {
         var car = v[0];
         return isSymbol(car) ? syntaxes[car.name] ? _.contains([
             Sym('define'),
-            Sym('^')
+            Sym('^'),
+            Sym('set!'),
+            Sym('aset!')
         ], car) ? append(v.slice(0, 2), _.map(v.slice(2), function (x) {
             return expandMacros(x, mod);
         })) : car === Sym('throw') ? [

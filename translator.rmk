@@ -369,7 +369,7 @@
         (if (~ syntaxes car.name)
           ; Special forms
           ; TODO: expand macro for each form
-          (if (_.contains (array 'define '^) car)
+          (if (_.contains (array 'define '^ 'set! 'aset!) car)
             (append (v.slice 0 2)
                     (_.map (v.slice 2) (^(x) (expand-macros x mod))))
             (if (= car 'throw)
