@@ -1,3 +1,22 @@
+Important Changes
+
+* v0.1.0
+  * Changed syntax to represent JS null and JS undefined
+
+    before:
+      (define a null)
+      (define b undefined)
+
+    after v0.1.0:
+      (define a #null)
+      (define b #undefined)
+
+----
+(not yet) v0.1.0
+
+2012-11-09 v0.0.4
+  * fix: translator.js of 0.0.3 was broken
+
 2012-11-09 v0.0.3
   * new: quasiquote
     (Note: Nested quasiquote is not supported yet)
