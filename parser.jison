@@ -13,7 +13,7 @@ Symbol.prototype.toString = function(){
   return "'" + this.name;
 };
 Symbol.prototype.inspect = function(depth){
-  return "<" + this.name + ">";
+  return "'" + this.name;
 };
 var Symbols = {};
 Sym = function(name){
