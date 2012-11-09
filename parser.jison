@@ -63,7 +63,12 @@ rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 "{}"  return "{}";
 "("   return "(";
 ")"   return ")";
+
 "'"   return "'";
+"`"   return "`";
+",@"  return ",@";
+","   return ",";
+
 [-+*/%=^\|~]  return "IDENT";
 ".."  return "IDENT";
 {rmk_ident}"."{rmk_ident}         return "PROPREF";
@@ -105,7 +110,11 @@ expr
   | array
   | object
   | propref
+
   | quoted
+  | quasiquote
+  | unquote
+  | unquote_splicing
   ;
 
 ident
@@ -176,3 +185,18 @@ quoted
     { $$ = [Sym("quote"), $2]; }
   ;
 */
+
+quasiquote
+  : "`" array
+    { $$ = [Sym("quasiquote"), $2]; }
+  ;
+
+unquote
+  : "," expr
+    { $$ = [Sym("unquote"), $2]; }
+  ;
+
+unquote_splicing
+  : ",@" expr
+    { $$ = [Sym("unquote-splicing"), $2]; }
+  ;

@@ -304,29 +304,28 @@
                                               (value: (~ pair 0)))
                                        value: (convert-value (~ pair 1))))))))))))))
 
-;(define (expand-qq v lv)
-;  (if (not (_.array? v))
-;    v
-;    (begin
-;      (define car (~ v 0))
-;      (if (and (_.array? car)
-;               (= (~ car 0) 'unquote-splicing))
-;        (begin ; ((unquote-splicing foo) bar baz)
-;          (set! lv (- lv 1))
-;          (if (= lv 0)
-;            ; [<append> foo (expand-qq [bar baz] lv+1)]
-;            (begin
-;              (define rest (expand-qq (v.slice 1) (+ lv 1)))
-;              ;(.. (array (~ car 1)) (concat rest))
-;              (array '..
-;                     (array (Sym "array") 
+(define (expand-qq a)
+  (if (not (_.array? a))
+    a
+    (cons 'append (a.map (^(x)
+      (if (= (~ x 0) 'quasiquote)
+        (raise "Nested quasiquote is not supported yet")
+        (if (= (~ x 0) 'unquote)
+          (array 'array (~ x 1))
+          (if (= (~ x 0) 'unquote-splicing)
+            (~ x 1)
+            (if (symbol? x)
+              (array 'array (array 'quote x))
+              (if (_.array? x)
+                (expand-qq a)
+                x))))))))))
 
-(define (quote v)
-  (if (symbol? v)
-    (array 'Sym v.name)
-    (if (_.array? v)
-      (cons 'array (_.map v quote))
-      v)))
+(define (quote a)
+  (if (symbol? a)
+    (array 'Sym a.name)
+    (if (_.array? a)
+      (cons 'array (a.map quote))
+      a)))
 
 ; Macro
 (define macros
@@ -360,8 +359,9 @@
            (cons 'begin (v.slice 2))
            undefined))
 
-;   "quasiquote": (^(v)
-;     (expand-qq v 0))
+   "quasiquote": (^(v)
+     (raise-if (not (= v.length 2)) "malformed quasiquote")
+     (expand-qq (~ v 1)))
   ))
    
 (define (expand-macros v mod)
@@ -427,3 +427,4 @@
 
 (aset! module.exports "translate" translate)
 (aset! module.exports "translateExpr" translate-expr)
+(aset! module.exports "expandMacros" expand-macros)

@@ -280,11 +280,25 @@ var convertNode = function (v, isValueNeeded) {
             });
         })});
 };
-var quote = function (v) {
-    return isSymbol(v) ? [
+var expandQq = function (a) {
+    return !_.isArray(a) ? a : cons(Sym('append'), a.map(function (x) {
+        return x[0] === Sym('quasiquote') ? raise('Nested quasiquote is not supported yet') : x[0] === Sym('unquote') ? [
+            Sym('array'),
+            x[1]
+        ] : x[0] === Sym('unquote-splicing') ? x[1] : isSymbol(x) ? [
+            Sym('array'),
+            [
+                Sym('quote'),
+                x
+            ]
+        ] : _.isArray(x) ? expandQq(a) : x;
+    }));
+};
+var quote = function (a) {
+    return isSymbol(a) ? [
         Sym('Sym'),
-        v.name
-    ] : _.isArray(v) ? cons(Sym('array'), _.map(v, quote)) : v;
+        a.name
+    ] : _.isArray(a) ? cons(Sym('array'), a.map(quote)) : a;
 };
 var macros = {
         'quote': function (v) {
@@ -309,6 +323,10 @@ var macros = {
                 cons(Sym('begin'), v.slice(2)),
                 void 0
             ];
+        },
+        'quasiquote': function (v) {
+            raiseIf(!(v.length === 2), 'malformed quasiquote');
+            return expandQq(v[1]);
         }
     };
 var expandMacros = function (v, mod) {
@@ -379,3 +397,4 @@ var translate = function (exprs) {
 };
 module.exports['translate'] = translate
 module.exports['translateExpr'] = translateExpr
+module.exports['expandMacros'] = expandMacros

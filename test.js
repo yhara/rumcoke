@@ -37,6 +37,19 @@ function test(rum_code, js_code){
   }
 }
 
+function testm(rum_code, expanded_code){
+  var expected_expr = Parser.parser.parse(expanded_code);
+  var actual_expr = Translator.expandMacros(Parser.parser.parse(rum_code));
+
+  if (!_.isEqual(actual_expr, expected_expr)){
+    d("Expected:\n", expected_expr);
+    util.puts("");
+    d("Actual:\n", actual_expr);
+
+    throw("expansion failed: `" + rum_code + "` !=> `" + expanded_code + "`");
+  }
+}
+
 test("(define a 1)", "var a = 1;");
 test("(define (f) 1)", "var f = function(){ return 1; };");
 test("((^(x) x))", "(function(x){ return x })()");
@@ -94,3 +107,6 @@ test("(instance? x y)", "x instanceof y");
 test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 //test("(when x y z)", "if(x){ y; z; }");
 
+testm("`(a)", '(append (array (Sym "a")))');
+testm("`(,a)", '(append (array a))');
+testm("`(,@a)", '(append a)');
