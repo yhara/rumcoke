@@ -317,12 +317,9 @@ var macros = {
             ];
         },
         'when': function (v) {
-            return [
-                Sym('if'),
-                v[1],
-                cons(Sym('begin'), v.slice(2)),
-                void 0
-            ];
+            return quasiquote(unquote(v[1]) ? function () {
+                return unquoteSplicing(v.slice(2));
+            }() : void 0);
         },
         'quasiquote': function (v) {
             raiseIf(!(v.length === 2), 'malformed quasiquote');
