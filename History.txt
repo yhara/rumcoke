@@ -1,3 +1,7 @@
+2012-11-09 v0.0.3
+  * new: quasiquote
+    (Note: Nested quasiquote is not supported yet)
+
 2012-11-08 v0.0.2
   * Introduced macro in translator
     (You cannot define macro in user-program yet)
