@@ -344,8 +344,8 @@ var expandMacros = function (v, mod) {
             return macro ? function () {
                 mod['modified'] = true;
                 var ret = macro(v);
-                var _mod = {};
                 while (true) {
+                    var _mod = {};
                     ret = expandMacros(ret, _mod);
                     if (!_mod.modified) {
                         break;

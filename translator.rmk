@@ -397,8 +397,8 @@
               (begin ; Found macro usage
                 (aset! mod "modified" #t)
                 (define ret (macro v))
-                (define _mod {})
                 (while #t
+                  (define _mod {})
                   (set! ret (expand-macros ret _mod))
                   (when (not _mod.modified)
                     (break)))
