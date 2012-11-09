@@ -354,9 +354,10 @@
   ;            consequent: 
 
   "when": (^(v)
-    `(if ,(~ v 1)
-       (begin ,@(v.slice 2))
-       undefined))
+    (array 'if
+           (~ v 1)
+           (cons 'begin (v.slice 2))
+           undefined))
 
    "quasiquote": (^(v)
      (raise-if (not (= v.length 2)) "malformed quasiquote")
