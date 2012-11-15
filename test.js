@@ -50,6 +50,16 @@ function testm(rum_code, expanded_code){
   }
 }
 
+// Literals
+test("a", "a");
+test("#t", "true");
+test("#f", "false");
+test("7.65", "7.65");
+test('"foo"', '"foo"');
+test('#/foo/', '/foo/');
+test('(array 1 2 3)', '[1,2,3]');
+
+// Special forms
 test("(define a 1)", "var a = 1;");
 test("(define (f) 1)", "var f = function(){ return 1; };");
 test("((^(x) x))", "(function(x){ return x })()");
