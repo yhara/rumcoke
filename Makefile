@@ -10,7 +10,7 @@ parser.js: parser.jison
 	cat /tmp/parser.js >> parser.js
 
 accept: _translator.js
-	cp _translator.js translator.js
+	node test.js --debug && cp _translator.js translator.js
 
 debug: _translator.js
 	./rumcoke a.rmk --debug
