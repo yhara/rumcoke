@@ -20,6 +20,57 @@ var d = function (header, x) {
   util.puts(header + util.inspect(x, false, null, true));
 };
 
+function isEqv(a, b){
+  var toString = Object.prototype.toString;
+  var ret = null;
+  if (a === b)
+    ret = true;
+  else if (a == null || b == null)
+    ret = (a === b);
+  else if (toString.call(a) != toString.call(b))
+    ret = false;
+  else {
+    switch (toString.call(a)) {
+      case '[object String]':
+      case '[object Number]':
+      case '[object Date]':
+      case '[object Boolean]':
+        ret = (a == b);
+        break;
+      case '[object RegExp]':
+        ret = (a.source == b.source &&
+               a.global == b.global &&
+               a.multiline == b.multiline &&
+               a.ignoreCase == b.ignoreCase);
+        break;
+      default:
+        if (typeof a != 'object' || typeof b != 'object')
+          ret = false;
+        else {
+          for (k in a) {
+            if (!isEqv(a[k], b[k])){
+              ret = false;
+              break;
+            }
+          }
+          for (k in b) {
+            if (!isEqv(a[k], b[k])){
+              ret = false;
+              break;
+            }
+          }
+          if (ret === null) ret = true;
+        }
+    }
+  }
+
+  if (!ret){
+    d("A: ", a);
+    d("B: ", b);
+  }
+  return ret;
+};
+
 function test(rum_code, js_code){
   var expected_ast = esprima.parse(js_code)["body"][0];
   if (expected_ast.type == "ExpressionStatement")
@@ -28,6 +79,7 @@ function test(rum_code, js_code){
   var rum_expr = Parser.parser.parse(rum_code)[0];
   var given_ast = Translator.translateExpr(rum_expr);
 
+  //if (!isEqv(given_ast, expected_ast)){
   if (!_.isEqual(given_ast, expected_ast)){
     d("Expected: ", expected_ast);
     util.puts("");
