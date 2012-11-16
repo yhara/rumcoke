@@ -1,13 +1,15 @@
-Important Changes
+Incompatible Changes
 
 * v0.1.0
-  * Changed syntax to represent JS null and JS undefined
+  * Changed syntax to describe JS null and JS undefined
 
     before:
+
       (define a null)
       (define b undefined)
 
-    after v0.1.0:
+    after:
+
       (define a #null)
       (define b #undefined)
 

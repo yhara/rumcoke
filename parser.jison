@@ -58,8 +58,8 @@ rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 "#("  return "#(";
 "#t"  return "#t";
 "#f"  return "#f";
-"null" return "null";
-"undefined" return "undefined";
+"#null" return "#null";
+"#undefined" return "#undefined";
 "{}"  return "{}";
 "("   return "(";
 ")"   return ")";
@@ -124,8 +124,8 @@ ident
 boolean
   : "#t" { $$ = true; }
   | "#f" { $$ = false; }
-  | "null" { $$ = null; }
-  | "undefined" { $$ = undefined; }
+  | "#null" { $$ = null; }
+  | "#undefined" { $$ = undefined; }
   ;
 
 number

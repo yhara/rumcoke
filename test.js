@@ -106,10 +106,13 @@ function testm(rum_code, expanded_code){
 test("a", "a");
 test("#t", "true");
 test("#f", "false");
+test("#null", "null");
+test("#undefined", "void 0");
 test("7.65", "7.65");
 test('"foo"', '"foo"');
 test('#/foo/', '/foo/');
 test('(array 1 2 3)', '[1,2,3]');
+test('(f (a: 1 b: 2))', 'f({"a": 1, "b": 2})');
 
 // Special forms
 test("(define a 1)", "var a = 1;");
