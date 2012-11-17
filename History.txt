@@ -14,7 +14,8 @@ Incompatible Changes
       (define b #undefined)
 
 ----
-(not yet) v0.1.0
+2012-11-17 v0.1.0
+  * change: null, undefined -> #null, #undefined
 
 2012-11-09 v0.0.4
   * fix: translator.js of 0.0.3 was broken
