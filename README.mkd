@@ -47,7 +47,7 @@ Usage
 Documents
 =========
 
-See [doc/](./tree/master/doc)
+See [doc/](https://github.com/yhara/rumcoke/tree/master/doc)
 
 Syntax
 ======
