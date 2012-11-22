@@ -3,9 +3,9 @@ RumCoke
 
 RumCoke is a programming language with lisp-like syntax and
 translated into JavaScript.
+(Imagine "What if CoffeeScript is based on s-expression?")
 
-Current state
--------------
+### Current state
 
 Experimental (just started)
 
@@ -21,6 +21,7 @@ TODO
 
 * quasiquote
 * Lisp style macro
+* Source Map
 
 Example
 -------
@@ -31,12 +32,12 @@ Hello World
     (util.puts "Hello, world!")
 
 Requirements
-============
+------------
 
 Node.js (tested with v0.8.14)
 
 Usage
-=======
+-----
 
     $ git clone https://github.com/yhara/rumcoke
     $ npm install
@@ -45,12 +46,14 @@ Usage
     Hello, world!
 
 Documents
-=========
+---------
 
 See [doc/](https://github.com/yhara/rumcoke/tree/master/doc)
 
 Syntax
-======
+------
+
+TODO: move to doc/
 
 Variable
 
@@ -100,7 +103,7 @@ TODO
 * try-catch
 
 Why?
-====
+----
 
 * An experiment to make a sexp-based CoffeeScript
   * JavaScript and Scheme are both lisp-2, have 1st-class functions, ... 
@@ -116,12 +119,12 @@ Why?
   They are sometimes even faster than hand-written JavaScript.
 
 License
-=======
+-------
 
 MIT
 
 Contact
-=======
+-------
 
 https://github.com/yhara/rumcoke
 
