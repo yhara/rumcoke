@@ -122,6 +122,7 @@ test("(.. a b)", "a.b");
 test("(.. a (b 1))", "a.b(1)");
 test("(set! x 1)", "x = 1");
 test("(aset! x y 1)", "x[y] = 1");
+test("(new Date 2012 1 1)", "new Date(2012, 1, 1)");
 test("(~ a b)", "a[b]");
 test("(array 1 2)", "[1,2]");
 // test(quote
@@ -146,14 +147,14 @@ test("(- x y)", "x - y");
 test("(* x y)", "x * y");
 test("(/ x y)", "x / y");
 
-// Macro expansion
-// macro inside special forms
+// Macro inside special forms
 test("(define x (quote x))", "var x = Sym('x')");
 test("(.. (quote x) y)", "Sym('x').y");
 test("(.. (quote x) (y (quote z)))", "Sym('x').y(Sym('z'))");
 test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
 test("(set! x (quote x))", "x = Sym('x')");
 test("(aset! x (quote x) y)", "x[Sym('x')] = y");
+test("(new (quote x))", "new (Sym('x'))");
 test("(~ (quote x) 0)", "Sym('x')[0]");
 test("(array (quote x))", "[Sym('x')]");
 test("(= (quote x) y)", "Sym('x') === y");

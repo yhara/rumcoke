@@ -156,6 +156,12 @@ var syntaxes = {
                 'property': convertValue(v[2])
             });
         },
+        'new': function (v) {
+            return ast('NewExpression', {
+                'callee': convertValue(v[1]),
+                'arguments': _.map(v.slice(2), convertValue)
+            });
+        },
         'array': function (v) {
             return ast('ArrayExpression', {'elements': _.map(v.slice(1), convertValue)});
         },
@@ -347,6 +353,7 @@ var expandMacros = function (v, mod) {
             Sym('and'),
             Sym('or'),
             Sym('~'),
+            Sym('new'),
             Sym('array'),
             Sym('='),
             Sym('if'),

@@ -160,6 +160,11 @@
        object: (convert-value (~ v 1))
        property: (convert-value (~ v 2)))))
 
+   "new": (^(v)
+     (ast "NewExpression"
+       (callee: (convert-value (~ v 1))
+        arguments: (_.map (v.slice 2) convert-value))))
+
    "array": (^(v)
      (ast "ArrayExpression"
        (elements: (_.map (v.slice 1) convert-value))))
@@ -377,7 +382,7 @@
           (if (_.contains (array 'define '^ 'set! 'aset!) car)
             (append (v.slice 0 2)
                     (_.map (v.slice 2) expand-inner))
-            (if (_.contains (array 'throw 'not 'and 'or '~ 'array
+            (if (_.contains (array 'throw 'not 'and 'or '~ 'new 'array
                                    '= 'if 'begin 'while) car)
               (v.map expand-inner)
               (if (= '.. car)
