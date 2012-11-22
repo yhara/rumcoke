@@ -33,7 +33,7 @@ Hello World
 Requirements
 ============
 
-Node.js
+Node.js (tested with v0.8.14)
 
 Usage
 =======
@@ -43,6 +43,11 @@ Usage
     $ ./node_modules/jison/lib/jison/cli-wrapper.js parser.jison
     $ ./rumcoke hello.rmk | node
     Hello, world!
+
+Documents
+=========
+
+See [doc/](./tree/master/doc)
 
 Syntax
 ======

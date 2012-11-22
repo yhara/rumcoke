@@ -1,19 +1,10 @@
-Incompatible Changes
-
-* v0.1.0
-  * Changed syntax to describe JS null and JS undefined
-
-    before:
-
-      (define a null)
-      (define b undefined)
-
-    after:
-
-      (define a #null)
-      (define b #undefined)
+See doc/UPGRADE.mkd for list of incompatible changes.
 
 ----
+2012-11-22 v0.1.1
+  * change: Removed syntax `{}'
+  * new: Special form `new' 
+
 2012-11-17 v0.1.0
   * change: null, undefined -> #null, #undefined
 
