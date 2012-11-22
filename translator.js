@@ -11,7 +11,7 @@ var d = function (x) {
     return util.puts('debug: ', util.inspect(x, false, null, true));
 };
 var raise = function (msg, info) {
-    info || (info = {});
+    info || (info = new Object());
     info['ERROR'] = msg;
     return function () {
         throw util.inspect(info);
@@ -336,7 +336,7 @@ var macros = {
         }
     };
 var expandMacros = function (v, mod) {
-    mod || (mod = {});
+    mod || (mod = new Object());
     var expandInner = function (x) {
         return expandMacros(x, mod);
     };
@@ -370,7 +370,7 @@ var expandMacros = function (v, mod) {
                 mod['modified'] = true;
                 var ret = macro(v);
                 while (true) {
-                    var _mod = {};
+                    var _mod = new Object();
                     ret = expandMacros(ret, _mod);
                     if (!_mod.modified) {
                         break;

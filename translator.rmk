@@ -19,7 +19,7 @@
 ;(util.puts "--")
 
 (define (raise msg info)
-  (or info (set! info {}))
+  (or info (set! info (new Object)))
   (aset! info "ERROR" msg)
   (throw (util.inspect info)))
 (define (raise-if cond msg info)
@@ -370,7 +370,7 @@
   ))
    
 (define (expand-macros v mod)
-  (or mod (set! mod {}))
+  (or mod (set! mod (new Object)))
   (define (expand-inner x)
     (expand-macros x mod))
   (if (_.array? v)
@@ -403,7 +403,7 @@
                 (aset! mod "modified" #t)
                 (define ret (macro v))
                 (while #t
-                  (define _mod {})
+                  (define _mod (new Object))
                   (set! ret (expand-macros ret _mod))
                   (when (not _mod.modified)
                     (break)))

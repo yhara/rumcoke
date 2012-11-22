@@ -60,7 +60,6 @@ rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
 "#f"  return "#f";
 "#null" return "#null";
 "#undefined" return "#undefined";
-"{}"  return "{}";
 "("   return "(";
 ")"   return ")";
 
@@ -105,7 +104,6 @@ expr
   | number
   | string
   | regexp
-  | emptyobj
   | vector
   | array
   | object
@@ -138,10 +136,6 @@ string
 
 regexp
   : REGEXP { $$ = new RegExp(yytext.slice(2, -1)); }
-  ;
-
-emptyobj
-  : "{}" { $$ = {}; }
   ;
 
 vector
