@@ -291,9 +291,8 @@
             (begin
               (define first (~ v 0))
               (define rest (v.slice 1))
-              (define conv (if (symbol? first)
-                             (~ syntaxes first.name)
-                             #f))
+              (define conv (and (symbol? first)
+                             (~ syntaxes first.name)))
               (if conv
                 (conv v value-needed?)
                 (ast "CallExpression"

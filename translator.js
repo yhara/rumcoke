@@ -273,7 +273,7 @@ var convertNode = function (v, isValueNeeded) {
     }) : _.isEmpty(v) ? ast('ObjectExpression', {'properties': []}) : isSymbol(v) ? ast('Identifier', {'name': v.jsName}) : _.isArray(v) ? function () {
         var first = v[0];
         var rest = v.slice(1);
-        var conv = isSymbol(first) ? syntaxes[first.name] : false;
+        var conv = isSymbol(first) && syntaxes[first.name];
         return conv ? conv(v, isValueNeeded) : ast('CallExpression', {
             'callee': convertValue(v[0]),
             'arguments': rest.map(convertValue)
