@@ -1,18 +1,19 @@
 #!/usr/bin/env node
+// vim: set ft=javascript:
 
 var util = require("util"),
     fs = require("fs"),
     _ = require("underscore"),
-    escodegen = require("escodegen"),
-    Parser = require("./parser"),
-    Translator = require("./translator");
+    escodegen = require("escodegen");
+
+var RumCoke = require("../lib/rumcoke");
 
 if(process.argv[2]) {
   if(_.contains(process.argv, "--debug"))
     Translator = require("./_translator");
 
-  exprs = Parser.parser.parse(fs.readFileSync(process.argv[2], "utf8"));
-  Translator.translate(exprs);
+  exprs = RumCoke.Parser.parser.parse(fs.readFileSync(process.argv[2], "utf8"));
+  RumCoke.Translator.translate(exprs);
 }
 else {
   util.puts("usage: rumcoke foo.rmk > foo.js");

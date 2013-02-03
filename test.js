@@ -9,12 +9,11 @@ var util = require("util"),
     fs = require("fs"),
     _ = require("underscore"),
     escodegen = require("escodegen"),
-    esprima = require("esprima"),
-    Parser = require("./parser"),
-    Translator = require("./translator");
+    esprima = require("esprima");
 
+var RumCoke = require('./lib/rumcoke');
 if(_.contains(process.argv, "--debug"))
-  Translator = require("./_translator");
+  RumCoke.Translator = require("./lib/rumcoke/_translator");
 
 var d = function (header, x) {
   util.puts(header + util.inspect(x, false, null, true));
@@ -76,8 +75,8 @@ function test(rum_code, js_code){
   if (expected_ast.type == "ExpressionStatement")
     expected_ast = expected_ast.expression;
 
-  var rum_expr = Parser.parser.parse(rum_code)[0];
-  var given_ast = Translator.translateExpr(rum_expr);
+  var rum_expr = RumCoke.Parser.parser.parse(rum_code)[0];
+  var given_ast = RumCoke.Translator.translateExpr(rum_expr);
 
   //if (!isEqv(given_ast, expected_ast)){
   if (!_.isEqual(given_ast, expected_ast)){
@@ -90,8 +89,8 @@ function test(rum_code, js_code){
 }
 
 function testm(rum_code, expanded_code){
-  var expected_expr = Parser.parser.parse(expanded_code);
-  var actual_expr = Translator.expandMacros(Parser.parser.parse(rum_code));
+  var expected_expr = RumCoke.Parser.parser.parse(expanded_code);
+  var actual_expr = RumCoke.Translator.expandMacros(RumCoke.Parser.parser.parse(rum_code));
 
   if (!_.isEqual(actual_expr, expected_expr)){
     d("Expected:\n", expected_expr);
