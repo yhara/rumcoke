@@ -148,6 +148,7 @@ test("(* x y)", "x * y");
 test("(/ x y)", "x / y");
 
 // Macro inside special forms
+// test("(f (a: (quote x)))", 'f({"a": Sym("x")})');
 test("(define x (quote x))", "var x = Sym('x')");
 test("(.. (quote x) y)", "Sym('x').y");
 test("(.. (quote x) (y (quote z)))", "Sym('x').y(Sym('z'))");
