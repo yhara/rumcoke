@@ -8,13 +8,49 @@ var util = require("util"),
 
 var RumCoke = require("../lib/rumcoke");
 
-if(process.argv[2]) {
-  if(_.contains(process.argv, "--debug"))
-    Translator = require("./_translator");
+function repl(){
+  var rl = require('readline').createInterface(process.stdin,
+                                               process.stdout);
+  var erred = new Object();
 
+  rl.on('line', function(line) {
+    try{
+      var js = RumCoke.convert(line);
+      util.puts("-- js:");
+      util.puts(js);
+      util.puts("-- result:");
+      var result = eval(js);
+      util.puts(util.inspect(result));
+    } catch (e) {
+      util.puts(util.inspect(e));
+    }
+    util.puts("");
+
+    rl.prompt();
+  });
+
+  rl.on('close', function() {
+    process.exit(0);
+  });
+
+  var prompt = "> ";
+  rl.setPrompt(prompt, prompt.length);
+
+  util.puts('RumCoke');
+  util.puts('try (+ 1 2), etc. (Ctrl-D to exit)');
+  rl.prompt();
+}
+
+if(_.contains(process.argv, "--debug")){
+  RumCoke.Translator = require("../lib/rumcoke/_translator");
+}
+
+// FIXME: should use option parsing library
+if(process.argv[2] && process.argv[2] != "--debug") {
   exprs = RumCoke.Parser.parser.parse(fs.readFileSync(process.argv[2], "utf8"));
-  RumCoke.Translator.translate(exprs);
+  util.puts(RumCoke.Translator.translate(exprs));
 }
 else {
-  util.puts("usage: rumcoke foo.rmk > foo.js");
+  repl();
+  //util.puts("usage: rumcoke foo.rmk > foo.js");
 }
