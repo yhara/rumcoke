@@ -7,8 +7,10 @@
 (define RUM_VERSION (require "./version"))
 (define Parser (require "./parser"))
 (define parser Parser.parser)
-(define Sym Parser.Sym)
-(define symbol? Parser.isSymbol)
+
+(define RumExpr (require "./rum_expr"))
+(define Sym RumExpr.Sym)
+(define symbol? RumExpr.isSymbol)
 
 (define (d x)
   (util.puts "debug: " (util.inspect x #f null #t)))

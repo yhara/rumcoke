@@ -1,33 +1,8 @@
 /* -- JavaScript code -- */
 %{
 
-function Symbol(name){
-  this.name = name;
-  this.jsName = name.replace(/[-](\w)/g, function(match, c){
-      return c.toUpperCase();
-    }).replace(/^(\w)(.*)\?$/, function(match, c, rest){
-      return "is" + c.toUpperCase() + rest;
-    });
-}
-Symbol.prototype.toString = function(){
-  return "'" + this.name;
-};
-Symbol.prototype.inspect = function(depth){
-  return "'" + this.name;
-};
-var Symbols = {};
-Sym = function(name){
-  var found = Symbols[name];
-  if (found) {
-    return found;
-  }
-  else {
-    return (Symbols[name] = new Symbol(name));
-  }
-};
-exports.Sym = Sym;
-exports.Symbol = Symbol;
-exports.isSymbol = function(x){ return x instanceof Symbol; };
+var RumExpr = require('./rum_expr');
+var Sym = RumExpr.Sym;
 
 %}
 
