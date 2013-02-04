@@ -7,6 +7,9 @@ var util = require("util"),
     escodegen = require("escodegen");
 
 var RumCoke = require("../lib/rumcoke");
+if(_.contains(process.argv, "--debug")){
+  RumCoke = require("../debug/rumcoke");
+}
 
 function repl(){
   var rl = require('readline').createInterface(process.stdin,
@@ -39,10 +42,6 @@ function repl(){
   util.puts('RumCoke ' + RumCoke.VERSION);
   util.puts('try (+ 1 2), etc. (Ctrl-D to exit)');
   rl.prompt();
-}
-
-if(_.contains(process.argv, "--debug")){
-  RumCoke.Translator = require("../lib/rumcoke/_translator");
 }
 
 // FIXME: should use option parsing library

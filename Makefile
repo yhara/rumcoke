@@ -1,7 +1,9 @@
-build: lib/rumcoke/_translator.js
+default: build_debug
 
-lib/rumcoke/_translator.js: lib/rumcoke/translator.js lib/rumcoke/translator.rmk lib/rumcoke/parser.js
-	./bin/rumcoke lib/rumcoke/translator.rmk > lib/rumcoke/_translator.js
+build_debug: lib/rumcoke/parser.jison lib/rumcoke/translator.rmk
+	cp -r lib/ debug/
+	jison lib/rumcoke/parser.jison -o debug/rumcoke/parser.js
+	./bin/rumcoke lib/rumcoke/translator.rmk > debug/rumcoke/translator.js
 
 lib/rumcoke/parser.js: lib/rumcoke/parser.jison
 	jison lib/rumcoke/parser.jison -o /tmp/parser.js
@@ -10,7 +12,7 @@ lib/rumcoke/parser.js: lib/rumcoke/parser.jison
 	cat /tmp/parser.js >> lib/rumcoke/parser.js
 
 accept: lib/rumcoke/_translator.js
-	node test.js --debug && cp lib/rumcoke/_translator.js lib/rumcoke/translator.js
+	node test.js --debug && cp debug/rumcoke/translator.js lib/rumcoke/translator.js && debug/rumcoke/parser.js lib/rumcoke/parser.js
 
 debug: lib/rumcoke/_translator.js
 	./bin/rumcoke a.rmk --debug

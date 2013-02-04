@@ -12,8 +12,9 @@ var util = require("util"),
     esprima = require("esprima");
 
 var RumCoke = require('./lib/rumcoke');
-if(_.contains(process.argv, "--debug"))
-  RumCoke.Translator = require("./lib/rumcoke/_translator");
+if(_.contains(process.argv, "--debug")) {
+  RumCoke = require("./debug/rumcoke");
+}
 
 var d = function (header, x) {
   util.puts(header + util.inspect(x, false, null, true));
