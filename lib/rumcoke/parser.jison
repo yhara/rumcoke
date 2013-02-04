@@ -131,7 +131,18 @@ number
   ;
 
 string
-  : STRING { $$ = yytext.slice(1, -1); }
+  : STRING {
+      $$ = yytext.slice(1, -1)
+             .replace(/(^|[^\\])\\'/, "'")
+             .replace(/(^|[^\\])\\"/, '"')
+             .replace(/(^|[^\\])\\b/, "\b")
+             .replace(/(^|[^\\])\\f/, "\f")
+             .replace(/(^|[^\\])\\n/, "\n")
+             .replace(/(^|[^\\])\\r/, "\r")
+             .replace(/(^|[^\\])\\t/, "\t")
+             .replace(/(^|[^\\])\\v/, "\v")
+             .replace(/\\\\/, "\\");
+    }
   ;
 
 regexp
