@@ -36,7 +36,7 @@ function repl(){
   var prompt = "> ";
   rl.setPrompt(prompt, prompt.length);
 
-  util.puts('RumCoke');
+  util.puts('RumCoke ' + RumCoke.VERSION);
   util.puts('try (+ 1 2), etc. (Ctrl-D to exit)');
   rl.prompt();
 }
