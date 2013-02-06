@@ -182,4 +182,4 @@ testm("`(,@a ,@b)", '(append a b)');
 testm("`((a b))", '(append (array \
                      (append (array (Sym "a")) (array (Sym "b")))))');
 testm('(cond (a b) (c d e))', '(if a b (if c (begin d e) #undefined))');
-//testm('(cond (a b) (else d))', '(if a b );
+testm('(cond (a b) (else c d))', '(if a b (begin c d))');

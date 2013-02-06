@@ -375,27 +375,30 @@
   ;           (test: 
   ;            consequent: 
 
-  ; (cond (a b) (c d)) => (if a b (if c d undefined))
-  ;
-  ; TODO: else
   "cond": (^(v)
     (raise-if (= v.length 1)
               "at least one clause is required for cond")
     (define clauses (v.slice 1))
-    (define init #undefined)
 
     (_.reduceRight clauses (^(ret clause)
       (raise-if (not (_.array? clause))
                     ; FIXME: now we need < operator
                     ; (< clause.length 2))
                 "bad clause in cond" (clause: clause))
-      (define test (~ clause 0))
-      (define body (clause.slice 1))
-      (if (= body.length 1)
-        `(if ,test ,(~ body 0) ,ret)
-        `(if ,test (begin ,@body) ,ret)))
 
-      init))
+      (if (and (_.undefined? ret) (= (~ clause 0) 'else))
+        ; This cond has 'else clause
+        (if (= clause.length 2)
+          (~ clause 1)
+          `(begin ,@(clause.slice 1)))
+        (begin
+          (define test (~ clause 0))
+          (define body (clause.slice 1))
+          (if (= body.length 1)
+            `(if ,test ,(~ body 0) ,ret)
+            `(if ,test (begin ,@body) ,ret)))))
+
+      #undefined))
 
   "when": (^(v)
     (array 'if
