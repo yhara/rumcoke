@@ -1,9 +1,9 @@
-RumCoke
-=======
+RumCoke - JavaScript in Scheme syntax
+=====================================
 
 RumCoke is a programming language with lisp-like syntax and
 translated into JavaScript.
-(Imagine "What if CoffeeScript is based on s-expression?")
+It is like CoffeeScript based on S-Expression.
 
 ### Current state
 
