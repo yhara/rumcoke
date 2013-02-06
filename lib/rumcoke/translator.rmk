@@ -330,16 +330,16 @@
           (raise "Nested quasiquote is not supported yet"))
         ; ,foo
         ((= (~ x 0) 'unquote)
-          (array 'array (~ x 1)))
+          `(array ,(~ x 1)))
         ; ,@foo
         ((= (~ x 0) 'unquote-splicing)
          (~ x 1))
         ; foo
         ((symbol? x)
-         (array 'array (array 'quote x)))
+         `(array (quote ,x)))  ; FIXME: should be written as ',x
         ; (foo bar)
         ((_.array? x)
-         (array 'array (expand-qq x)))
+         `(array ,(expand-qq x)))
         ; Literal
         (else
          x)))))))
