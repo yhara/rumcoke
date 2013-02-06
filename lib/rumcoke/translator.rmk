@@ -283,41 +283,40 @@
   (convert-node v #t))
 
 (define (convert-node v value-needed?)
-  (if (or (_.number? v) (_.string? v) (_.reg-exp? v)
-          (_.boolean? v) (_.null? v))
-    (ast "Literal" (value: v))
-    (if (_.undefined? v)
+  (cond
+    ((or (_.number? v) (_.string? v) (_.reg-exp? v)
+         (_.boolean? v) (_.null? v))
+      (ast "Literal" (value: v)))
+    ((_.undefined? v)
       (ast "UnaryExpression"
         (operator: "void"
-         argument: (ast "Literal" (value: 0))))
-      (if (_.empty? v)
-        ; TODO: Replace this with `(new Object)'
-        (ast "ObjectExpression" (properties: (array)))
-        (if (symbol? v)
-          (ast "Identifier" (name: v.jsName))
-          (if (_.array? v)
-            ; Application
-            (begin
-              (define first (~ v 0))
-              (define rest (v.slice 1))
-              (define conv (and (symbol? first)
-                             (~ syntaxes first.name)))
-              (if conv
-                (conv v value-needed?)
-                (ast "CallExpression"
-                  (callee: (convert-value (~ v 0))
-                   arguments: (rest.map convert-value)))))
-            (if (obj-expr? v)
-              (ast "ObjectExpression" 
-                (properties:
-                  (_.map (_.pairs v.content)
-                    (^(pair)
-                      (ast "Property"
-                        (kind: "init"
-                         key: (ast "Literal"
-                                (value: (~ pair 0)))
-                         value: (convert-value (~ pair 1))))))))
-              (raise "Misplaced JS object" (js_object: v)))))))))
+         argument: (ast "Literal" (value: 0)))))
+    ((_.empty? v)
+      (ast "ObjectExpression" (properties: (array))))
+    ((symbol? v)
+      (ast "Identifier" (name: v.jsName)))
+    ((_.array? v)
+      ; Application
+      (begin
+        (define first (~ v 0))
+        (define rest (v.slice 1))
+        (define conv (and (symbol? first)
+                       (~ syntaxes first.name)))
+        (if conv
+          (conv v value-needed?)
+          (ast "CallExpression"
+            (callee: (convert-value (~ v 0))
+             arguments: (rest.map convert-value))))))
+    ((obj-expr? v)
+      (ast "ObjectExpression" 
+        (properties:
+          (_.map (_.pairs v.content) (^(pair)
+            (ast "Property"
+              (kind: "init"
+               key: (ast "Literal" (value: (~ pair 0)))
+               value: (convert-value (~ pair 1)))))))))
+    (else
+      (raise "Misplaced JS object" (js_object: v)))))
 
 (define (expand-qq a)
   (if (not (_.array? a))
