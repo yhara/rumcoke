@@ -1,3 +1,7 @@
+STABLE_BUILD_FILES = \
+	lib/rumcoke/parser.js \
+	lib/rumcoke/translator.js
+
 DEBUG_BUILD_FILES = \
 	debug/rumcoke/parser.js \
 	debug/rumcoke/translator.js
@@ -22,5 +26,5 @@ accept: $(DEBUG_BUILD_FILES)
 debug: $(DEBUG_BUILD_FILES)
 	./bin/rumcoke a.rmk --debug
 
-test: $(DEBUG_BUILD_FILES)
+test: $(DEBUG_BUILD_FILES) $(STABLE_BUILD_FILES)
 	node test.js --debug
