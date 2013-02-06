@@ -179,5 +179,7 @@ test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 testm("`(a b)", '(append (array (Sym "a")) (array (Sym "b")))');
 testm("`(,a ,b)", '(append (array a) (array b))');
 testm("`(,@a ,@b)", '(append a b)');
-testm('(cond (a b) (c d))', '(if a b (if c d #undefined))');
+testm("`((a b))", '(append (array \
+                     (append (array (Sym "a")) (array (Sym "b")))))');
+testm('(cond (a b) (c d e))', '(if a b (if c (begin d e) #undefined))');
 //testm('(cond (a b) (else d))', '(if a b );

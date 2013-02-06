@@ -322,17 +322,24 @@
 (define (expand-qq a)
   (if (not (_.array? a))
     a
+    ; Expand list
     (cons 'append (a.map (^(x)
+      ; (quasiquote ...)
       (if (= (~ x 0) 'quasiquote)
         (raise "Nested quasiquote is not supported yet")
+        ; (unquote ...)
         (if (= (~ x 0) 'unquote)
           (array 'array (~ x 1))
+          ; (unquote-splicing ...)
           (if (= (~ x 0) 'unquote-splicing)
             (~ x 1)
+            ; foo
             (if (symbol? x)
               (array 'array (array 'quote x))
+              ; (foo bar)
               (if (_.array? x)
-                (expand-qq a)
+                (array 'array (expand-qq x))
+                ; Literal
                 x))))))))))
 
 (define (_quote a)
@@ -378,13 +385,16 @@
     (define init #undefined)
 
     (_.reduceRight clauses (^(ret clause)
-      (raise-if (or (not (_.array? clause))
-                    (not (= clause.length 2)))
+      (raise-if (not (_.array? clause))
+                    ; FIXME: now we need < operator
+                    ; (< clause.length 2))
                 "bad clause in cond" (clause: clause))
       (define test (~ clause 0))
-      (define body (~ clause 1))
-      `(if ,test ,body ,ret)
-      )
+      (define body (clause.slice 1))
+      (if (= body.length 1)
+        `(if ,test ,(~ body 0) ,ret)
+        `(if ,test (begin ,@body) ,ret)))
+
       init))
 
   "when": (^(v)
