@@ -423,22 +423,25 @@
       (if (symbol? car)
         (if (~ syntaxes car.name)
           ; Special forms
-          (if (_.contains (array 'define '^ 'set! 'aset!) car)
-            (append (v.slice 0 2)
-                    (_.map (v.slice 2) expand-inner))
-            (if (_.contains (array 'throw 'not 'and 'or '~ 'new 'array
-                                   '= 'if 'begin 'while) car)
-              (v.map expand-inner)
-              (if (= '.. car)
-                (append (array '.. (expand-macros (~ v 1) mod))
-                  (_.map (v.slice 2) (^(c)
-                    (if (symbol? c)
-                      (expand-macros c mod)
-                      (if (_.array? c)
-                        (cons (~ c 0)
-                          (_.map (c.slice 1) expand-inner))
-                        (raise "malformed .."))))))
-                v)))
+          (cond
+            ((_.contains (array 'define '^ 'set! 'aset!) car)
+             (append (v.slice 0 2)
+                     (_.map (v.slice 2) expand-inner)))
+            ((_.contains (array 'throw 'not 'and 'or '~ 'new 'array
+                                '= 'if 'begin 'while) car)
+             (v.map expand-inner))
+            ((= '.. car)
+             (append (array '.. (expand-macros (~ v 1) mod))
+                     (_.map (v.slice 2) (^(c)
+                       (cond ((symbol? c)
+                              (expand-macros c mod))
+                             ((_.array? c)
+                              (cons (~ c 0)
+                                    (_.map (c.slice 1) expand-inner)))
+                             (else
+                               (raise "malformed ..")))))))
+            (else
+              v))
           ; Not a special form
           (begin
             (define macro (~ macros car.name))
