@@ -144,10 +144,10 @@ test("(throw x)", "throw x");
 
 test('(raw-js-ast (type: "Literal" value: 7))', "7");
 
-test("(+ x y)", "x + y"); // TODO: multiple args
-test("(- x y)", "x - y");
-test("(* x y)", "x * y");
-test("(/ x y)", "x / y");
+test("(+ x y z)", "x + y + z");
+test("(- x y z)", "x - y - z");
+test("(* x y z)", "x * y * z");
+test("(/ x y z)", "x / y / z");
 
 // Macro inside special forms
 test("(f (a: (quote x)))", 'f({"a": Sym("x")})');
@@ -175,6 +175,8 @@ test("(quote (x y))", "[Sym('x'), Sym('y')]");
 test("(instance? x y)", "x instanceof y");
 test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 //test("(when x y z)", "if(x){ y; z; }");
+//test("(cond (a 1) (c 2))", "if(a){ 1 }elsif(c){ d; }"
+//test("(cond (a b) (else c))");
 
 testm("`(a)", '(append (array (Sym "a")))');
 testm("`(,a)", '(append (array a))');

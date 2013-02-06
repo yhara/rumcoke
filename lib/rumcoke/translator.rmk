@@ -269,14 +269,13 @@
        arg))
   ))
 
-(_.each (array "+" "-" "*" "/")
-        (^(op)
-          (aset! syntaxes op 
-                 (^(v) 
-                   (ast "BinaryExpression"
-                     (operator: op
-                      left: (convert-value (~ v 1))
-                      right: (convert-value (~ v 2))))))))
+(_.each (array "+" "-" "*" "/") (^(op)
+  (aset! syntaxes op (^(v) 
+    (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
+      (ast "BinaryExpression"
+        (operator: op
+         left: a
+         right: b))))))))
 
 (define (convert-value v)
   (convert-node v #t))
