@@ -336,7 +336,7 @@
          (~ x 1))
         ; foo
         ((symbol? x)
-         `(array (quote ,x)))  ; FIXME: should be written as ',x
+         `(array ',x))
         ; (foo bar)
         ((_.array? x)
          `(array ,(expand-qq x)))
