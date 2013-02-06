@@ -13,9 +13,11 @@
 (define symbol? RumExpr.isSymbol)
 (define obj-expr? RumExpr.isObjExpr)
 
-(define (d x y)
-  (or x (set! x "debug: "))
-  (util.puts x (util.inspect y #f null #t)))
+(define (d arg1 arg2)
+  (define header (if arg2 arg1 "debug: "))
+  (define value (or arg2 arg1))
+  (util.puts header (util.inspect value #f null #t))
+  value)
   ; util.inspect obj showHidden depth colors
 
 ;(define exprs (parser.parse (fs.readFileSync (~ process.argv 2) "utf8")))
@@ -31,8 +33,8 @@
   (when cond
     (raise msg info)))
 
-(define (append ary1 ary2)
-  (.. ary1 (concat ary2)))
+(define (append)
+  (_.reduce arguments (^(a b) (.. a (concat b)))))
 
 (define (cons obj ary)
   (append (array obj) ary))
@@ -366,6 +368,25 @@
   ;           (test: 
   ;            consequent: 
 
+  ; (cond (a b) (c d)) => (if a b (if c d undefined))
+  ;
+  ; TODO: else
+  "cond": (^(v)
+    (raise-if (= v.length 1)
+              "at least one clause is required for cond")
+    (define clauses (v.slice 1))
+    (define init #undefined)
+
+    (_.reduceRight clauses (^(ret clause)
+      (raise-if (or (not (_.array? clause))
+                    (not (= clause.length 2)))
+                "bad clause in cond" (clause: clause))
+      (define test (~ clause 0))
+      (define body (~ clause 1))
+      `(if ,test ,body ,ret)
+      )
+      init))
+
   "when": (^(v)
     (array 'if
            (~ v 1)
@@ -433,6 +454,7 @@
 
 (define (translate-expr expr)
   (define expanded (expand-macros expr))
+  ;(d "Macro expansion: " (before: expr after: expanded))
   (convert-node expanded))
 
 ; Convert rum-expr to JS

@@ -175,9 +175,9 @@ test("(quote (x y))", "[Sym('x'), Sym('y')]");
 test("(instance? x y)", "x instanceof y");
 test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 //test("(when x y z)", "if(x){ y; z; }");
-//test("(cond (a 1) (c 2))", "if(a){ 1 }elsif(c){ d; }"
-//test("(cond (a b) (else c))");
 
-testm("`(a)", '(append (array (Sym "a")))');
-testm("`(,a)", '(append (array a))');
-testm("`(,@a)", '(append a)');
+testm("`(a b)", '(append (array (Sym "a")) (array (Sym "b")))');
+testm("`(,a ,b)", '(append (array a) (array b))');
+testm("`(,@a ,@b)", '(append a b)');
+testm('(cond (a b) (c d))', '(if a b (if c d #undefined))');
+//testm('(cond (a b) (else d))', '(if a b );
