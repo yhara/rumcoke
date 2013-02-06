@@ -133,7 +133,7 @@ array
   ;
 
 object
-  : "(" properties ")" { $$ = $2; }
+  : "(" properties ")" { $$ = new RumExpr.ObjExpr($2); }
   ;
 
   properties
