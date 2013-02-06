@@ -316,7 +316,7 @@
                          key: (ast "Literal"
                                 (value: (~ pair 0)))
                          value: (convert-value (~ pair 1))))))))
-              (raise "Misplaced JS object" (v: v)))))))))
+              (raise "Misplaced JS object" (js_object: v)))))))))
 
 (define (expand-qq a)
   (if (not (_.array? a))
@@ -421,8 +421,16 @@
               (v.map expand-inner))))
         ; Computed funcall
         (v.map expand-inner)))
-    ; Literal
-    v))
+    (if (obj-expr? v) 
+      ; Object expression
+      (begin
+        (define ret (new Object))
+        (_.each v.content
+                (^(value key)
+                  (aset! ret key (expand-macros value))))
+        (new RumExpr.ObjExpr ret))
+      ; Literals
+      v)))
 
 (define (translate-expr expr)
   (define expanded (expand-macros expr))
