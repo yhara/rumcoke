@@ -334,18 +334,18 @@
                 (expand-qq a)
                 x))))))))))
 
-(define (quote a)
+(define (_quote a)
   (if (symbol? a)
     (array 'Sym a.name)
     (if (_.array? a)
-      (cons 'array (a.map quote))
+      (cons 'array (a.map _quote))
       a)))
 
 ; Macro
 (define macros
   ("quote": (^(v) 
     (raise-if (not (= v.length 2)) "malformed quote")
-    (quote (~ v 1)))
+    (_quote (~ v 1)))
 
   "instance?": (^(v)
     (raise-if (not (= v.length 3)) "malformed instance?")
