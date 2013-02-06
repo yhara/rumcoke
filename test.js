@@ -181,5 +181,7 @@ testm("`(,a ,b)", '(append (array a) (array b))');
 testm("`(,@a ,@b)", '(append a b)');
 testm("`((a b))", '(append (array \
                      (append (array (Sym "a")) (array (Sym "b")))))');
+testm("`(',b)",   '(append (array \
+                     (append (array (Sym "quote")) (array b))))');
 testm('(cond (a b) (c d e))', '(if a b (if c (begin d e) #undefined))');
 testm('(cond (a b) (else c d))', '(if a b (begin c d))');
