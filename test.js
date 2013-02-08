@@ -175,6 +175,8 @@ test("(quote (x y))", "[Sym('x'), Sym('y')]");
 test("(instance? x y)", "x instanceof y");
 test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 //test("(when x y z)", "if(x){ y; z; }");
+test('(case a ((b c) d) )', 'switch(a){ case b: case c: d; break; }');
+//test('(case a (else c))', 'switch(a){ default: c; }');
 
 testm("`(a b)", '(append (array (Sym "a")) (array (Sym "b")))');
 testm("`(,a ,b)", '(append (array a) (array b))');
