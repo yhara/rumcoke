@@ -371,9 +371,6 @@
          left: (translate-expr (~ v 1))
          right: (translate-expr (~ v 2))))))
 
-  ; (case a         switch(a){
-  ;   ((b c) d e)     [case b:] [case c: d; return d; break;]
-  ;   (else e))       [default: return e;]
   "case": (^(v)
     (array 'raw-js-ast
       (ast "SwitchStatement"
@@ -381,20 +378,25 @@
          cases:
            (flat-map (v.slice 2) (^(clause)
              (define cases (~ clause 0))
-             (define last-test (cases.pop))
-             (define body (clause.slice 1))
-             (append
-               (_.map cases (^(test)
-                 (ast "SwitchCase"
-                   (test: (translate-expr test)
-                    consequent: (array)))))
-               (array
-                 (ast "SwitchCase"
-                   (test: (translate-expr last-test)
-                    consequent:
-                      (append
-                        (convert-stmts body)
-                        (ast "BreakStatement" (label: null)))))))))))))
+             (if (= 'else cases)
+               (ast "SwitchCase"
+                 (test: #null
+                  consequent: (convert-stmts (clause.slice 1))))
+               (begin
+                 (define last-test (cases.pop))
+                 (define body (clause.slice 1))
+                 (append
+                   (_.map cases (^(test)
+                     (ast "SwitchCase"
+                       (test: (translate-expr test)
+                        consequent: (array)))))
+                   (array
+                     (ast "SwitchCase"
+                       (test: (translate-expr last-test)
+                        consequent:
+                          (append
+                            (convert-stmts body)
+                            (ast "BreakStatement" (label: null)))))))))))))))
 
   "cond": (^(v)
     (raise-if (= v.length 1)
