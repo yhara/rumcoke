@@ -16,14 +16,9 @@
 (define (d arg1 arg2)
   (define header (if arg2 arg1 "debug: "))
   (define value (or arg2 arg1))
-  (util.puts header (util.inspect value #f null #t))
+                    ;             obj   showHidden depth colors
+  (util.puts header (util.inspect value #f         null  #t))
   value)
-  ; util.inspect obj showHidden depth colors
-
-;(define exprs (parser.parse (fs.readFileSync (~ process.argv 2) "utf8")))
-
-;(util.puts (util.inspect exprs #f null #t))
-;(util.puts "--")
 
 (define (raise msg info)
   (or info (set! info (new Object)))
@@ -35,7 +30,6 @@
 
 (define (append) ; ls1 ls2 ...
   (_.flatten arguments true))
-  ;(_.reduce arguments (^(a b) (.. a (concat b)))))
 
 (define (flat-map ls f)
   (_.flatten (_.map ls f) true))
