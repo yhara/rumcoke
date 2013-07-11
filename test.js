@@ -104,6 +104,7 @@ function testm(rum_code, expanded_code){
 
 // Literals
 test("a", "a");
+test("$a", "$a");
 test("#t", "true");
 test("#f", "false");
 test("#null", "null");

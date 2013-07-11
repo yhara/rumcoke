@@ -13,10 +13,12 @@ var Sym = RumExpr.Sym;
 digit [0-9]
 alpha [a-zA-Z]
 alpha_ [a-zA-Z_]
+alpha_d [a-zA-Z_\$]
 alnum [a-zA-Z0-9]
 alnum_ [a-zA-Z0-9_]
-js_ident {alpha_}{alnum_}*
-rmk_ident {alpha_}[-_a-zA-Z0-9]*[\!\?]?
+alnum_d [a-zA-Z0-9_\$]
+js_ident {alpha_d}{alnum_d}*
+rmk_ident {alpha_d}[-_a-zA-Z0-9\$]*[\!\?]?
 
 /* Define exclusive start conditon for multi-line comment */
 %x ML_COMMENT
