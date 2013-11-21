@@ -1,0 +1,107 @@
+Special forms
+=============
+
+Here is a list of special forms.
+
+Note: Currently, RumCoke has a little more special forms than usual Lisp.
+Maybe some of them will be replaced by macro, using `raw-js-ast`.
+
+
+`define`
+--------
+
+    (define x 1)
+
+    (define (f x) (+ x 1))
+
+`^`
+---
+
+    (^(x) (+ x 1))
+
+`..`
+----
+
+    (.. obj foo)  ;=> obj.foo
+
+    (.. obj foo bar)  ;=> obj.foo.bar
+
+    (.. obj (foo bar))  ;=> obj.foo(bar)
+
+Note: I feel this is cryptic :-(
+
+`set!`
+------
+
+    (set! x 1)  ;=> x = 1
+
+`aset!`
+-------
+
+    (aset! x "foo" 1)  ;=> x["foo"] = 1
+
+
+Note: maybe `(set! x.foo 1)` and `(set! x[key] 1)` are better?
+
+`array`
+-------
+
+Like `list` in Lisp
+
+    (array 1 2 3)  ;=> [1,2,3]
+
+`=`
+---
+
+    (= x y)  ;=> x === y
+
+
+`if`
+----
+
+    (if x y z)
+
+`begin`
+-------
+
+    (if x
+      (begin (f) (g))
+      (begin (h) (i)))
+
+`and`
+-----
+
+    (and x y) 
+
+`or`
+----
+
+`not`
+-----
+
+`while`
+-------
+
+`break`
+-------
+
+`throw`
+-------
+
+    (throw x)  ;=> throw x;
+
+`raw-js-ast`
+------------
+
+(Used internally)
+
+    (raw-js-ast (type: "Literal" value: 7))  ;=> 7
+
+
+Predefined macros
+=================
+
+`instance?
+----------
+
+    (instance? x y)   ;=> x instanceof y
