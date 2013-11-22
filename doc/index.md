@@ -10,3 +10,5 @@ Language
 
 [Special Forms](special_forms.mkd)
 
+[Syntax](syntax.md)
+
