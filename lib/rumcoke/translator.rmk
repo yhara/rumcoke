@@ -13,6 +13,9 @@
 (define symbol? RumExpr.isSymbol)
 (define obj-expr? RumExpr.isObjExpr)
 
+; Print debug message
+; (d value)
+; (d "header:" value)
 (define (d arg1 arg2)
   (define header (if arg2 arg1 "debug: "))
   (define value (or arg2 arg1))
@@ -272,11 +275,27 @@
        arg))
   ))
 
+; Operators
 (_.each (array "+" "-" "*" "/") (^(op)
   (aset! syntaxes op (^(v) 
     (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
       (ast "BinaryExpression"
         (operator: op
+         left: a
+         right: b))))))))
+
+(_.each (array "<" "<=" ">" ">=") (^(op)
+  (aset! syntaxes op (^(v) 
+    (define l (_.initial (v.slice 1))) ; 1..last-1
+    (define r (v.slice 2))             ;   2..last
+    (define (binaryExpr pair)
+      (ast "BinaryExpression"
+        (operator: op
+         left: (convert-value (~ pair 0))
+         right: (convert-value (~ pair 1)))))
+    (_.reduce (_.map (_.zip l r) binaryExpr) (^(a b)
+      (ast "LogicalExpression"
+        (operator: "&&"
          left: a
          right: b))))))))
 

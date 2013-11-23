@@ -45,7 +45,9 @@ rmk_ident {alpha_d}[-_a-zA-Z0-9\$]*[\!\?]?
 ",@"  return ",@";
 ","   return ",";
 
-[-+*/%=^\|~]  return "IDENT";
+"<="            return "IDENT";
+">="            return "IDENT";
+[-+*/<>%=^\|~]  return "IDENT";
 ".."  return "IDENT";
 {rmk_ident}"."{rmk_ident}         return "PROPREF";
 {js_ident}*":"                   return "KEYWORD";

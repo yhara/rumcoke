@@ -149,6 +149,10 @@ test("(+ x y z)", "x + y + z");
 test("(- x y z)", "x - y - z");
 test("(* x y z)", "x * y * z");
 test("(/ x y z)", "x / y / z");
+test("(< x y z)", "x < y && y < z");
+test("(> x y z)", "x > y && y > z");
+test("(<= x y z)", "x <= y && y <= z");
+test("(>= x y z)", "x >= y && y >= z");
 
 // Macro inside special forms
 test("(f (a: (quote x)))", 'f({"a": Sym("x")})');
