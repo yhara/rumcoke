@@ -45,15 +45,18 @@ Usage
     $ ./rumcoke hello.rmk | node
     Hello, world!
 
+Run test
+--------
+
+    $ make test    ;=> OK if no error is shown
+
 Documents
 ---------
 
-See [doc/](https://github.com/yhara/rumcoke/tree/master/doc)
+See [doc/index.md](https://github.com/yhara/rumcoke/blob/master/doc/index.md)
 
-Syntax
-------
-
-TODO: move to doc/
+Cheat Sheet
+-----------
 
 Variable
 
