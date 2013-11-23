@@ -59,6 +59,7 @@ Variable
 * `(set! x 1)` => `x = 1;`
 
 Property
+
 * `(~ ary 0)` => `ary[0]`
 * `obj.foo` => `obj.foo`
 * `(aset! obj "foo" 1)` => `obj.foo = 1;`
@@ -78,11 +79,14 @@ Literal
 * `"foo"` => `"foo"`
 * `(array 1 2 3)` => `[1, 2, 3]`
 * `(array)` => `[]`
+* `(a: 1)` => `{a: 1}`
+* `("a?": 1)` => `{"a?": 1}`
 
 Operator
 
 * `(= x y)` => `x === y`
 * `(not (= x y))` => `x !== y`
+* `(instance? x Date)` => `x instanceof Date`
 
 Exception
 
@@ -142,4 +146,3 @@ https://github.com/yhara/rumcoke
 Yutaka HARA (yhara)
 
 twitter: [@yhara_en](https://twitter.com/yhara_en)
-

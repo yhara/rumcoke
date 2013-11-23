@@ -99,6 +99,11 @@ TODO: Do we need break with label?
 
     (throw x)  ;=> throw x;
 
+`instance?`
+-----------
+
+    (instance? x String)   ;=> x instanceof String
+
 `raw-js-ast`
 ------------
 
@@ -119,6 +124,8 @@ Predefined macros
 TODO
 ====
 
+* `&` `|` `^` `~` `<<` `>>` `>>>`
+  (In R6RS they are named bitwise-and, -ior, -xor, -not, bitwise-arithmetic-shift-left, -right. R6RS seems not to have `>>>`)
 * `case` (Convert to `switch`. Currently a macro, but should be a special-form)
 * `return` `continue`
 * `try .. catch`

@@ -267,6 +267,13 @@
        (wrap-with-function-call throw-stmt)
        throw-stmt))
 
+  "instance?": (^(v)
+    (raise-if (not (= v.length 3)) "malformed instance?")
+    (ast "BinaryExpression"
+      (operator: "instanceof"
+       left: (convert-value (~ v 1))
+       right: (convert-value (~ v 2)))))
+
    "raw-js-ast": (^(v)
      (raise-if (not (= v.length 2)) "malformed raw-js-ast")
      (define arg (~ v 1))
@@ -363,6 +370,7 @@
         (else
          x)))))))
 
+; Macro
 (define (_quote a)
   (if (symbol? a)
     (array 'Sym a.name)
@@ -370,19 +378,10 @@
       (cons 'array (a.map _quote))
       a)))
 
-; Macro
 (define macros
   ("quote": (^(v) 
     (raise-if (not (= v.length 2)) "malformed quote")
     (_quote (~ v 1)))
-
-  "instance?": (^(v)
-    (raise-if (not (= v.length 3)) "malformed instance?")
-    (array 'raw-js-ast 
-      (ast "BinaryExpression"
-        (operator: "instanceof"
-         left: (translate-expr (~ v 1))
-         right: (translate-expr (~ v 2))))))
 
   "case": (^(v)
     (array 'raw-js-ast

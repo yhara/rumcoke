@@ -142,6 +142,8 @@ test("(while 1 (f))", "while(1){ f(); }");
 test("(while 1 (f) (g))", "while(1){ f(); g(); }");
 test("(while 1 (break))", "while(1){ break }");
 test("(throw x)", "throw x");
+test("(instance? x y)", "x instanceof y");
+test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 
 test('(raw-js-ast (type: "Literal" value: 7))', "7");
 
@@ -177,8 +179,6 @@ test("(throw (quote x))", "throw(Sym('x'))");
 // Macros
 test("(quote x)", "Sym('x')");
 test("(quote (x y))", "[Sym('x'), Sym('y')]");
-test("(instance? x y)", "x instanceof y");
-test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
 //test("(when x y z)", "if(x){ y; z; }");
 test('(case a ((b c) d) )', 'switch(a){ case b: case c: d; break; }');
 test('(case a (else c))', 'switch(a){ default: c; }');
