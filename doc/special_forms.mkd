@@ -1,12 +1,6 @@
 Special forms
 =============
 
-Here is a list of special forms.
-
-Note: Currently, RumCoke has a little more special forms than usual Lisp.
-Maybe some of them will be replaced by macro, using `raw-js-ast`.
-
-
 `define`
 --------
 
@@ -43,15 +37,27 @@ Note: I feel this is cryptic :-(
 
 Note: maybe `(set! x.foo 1)` and `(set! x[key] 1)` are better?
 
+`~`
+---
+
+    (~ ary 0)  ;=> ary[0]
+
+`new`
+-----
+
+    (new Date 2013 1 1)  ;=> new Date(2013, 1, 1);
+
 `array`
 -------
 
-Like `list` in Lisp
+Like `list` in Lisp. Converted to JS array literal
 
     (array 1 2 3)  ;=> [1,2,3]
 
 `=`
 ---
+
+Converted to JS `===`
 
     (= x y)  ;=> x === y
 
@@ -68,22 +74,25 @@ Like `list` in Lisp
       (begin (f) (g))
       (begin (h) (i)))
 
-`and`
------
+`and`, `or`, `not`
+------------------
 
-    (and x y) 
-
-`or`
-----
-
-`not`
------
+    (and x y)  ;=> x && y
+    (or x y)   ;=> x || y
+    (not x)    ;=> !x
 
 `while`
 -------
 
+    (while expr
+      body...)
+
 `break`
 -------
+
+    (break)    ;=> break;
+
+TODO: Do we need break with label?
 
 `throw`
 -------
@@ -101,7 +110,25 @@ Like `list` in Lisp
 Predefined macros
 =================
 
-`instance?
-----------
+`instance?`
+-----------
 
     (instance? x y)   ;=> x instanceof y
+
+
+TODO
+====
+
+* `case` (Convert to `switch`. Currently a macro, but should be a special-form)
+* `return` `continue`
+* `try .. catch`
+* `inc!`, `dec!` (`++`, `--`)
+
+* `for`? (Do you need it?)
+
+* `this` (Currently handled as variable reference, but should be ThisExpression)
+
+Not supported
+=============
+
+* `with`
