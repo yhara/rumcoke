@@ -243,7 +243,7 @@
        (operator: "!"
         argument: (convert-value (~ v 1)))))
 
-   ; TODO: should `while` have value in RumCoke?
+   ; TODO: should `while` have value in RumCoke? (currently does not)
    "while": (^(v value-needed?)
      (define while-stmt (ast "WhileStatement"
                           (test: (convert-value (~ v 1))
