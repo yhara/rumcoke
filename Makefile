@@ -1,11 +1,12 @@
-STABLE_BUILD_FILES = \
-	lib/rumcoke/parser.js \
-	lib/rumcoke/translator.js
+#STABLE_BUILD_FILES = \
+#	lib/rumcoke/parser.js \
+#	lib/rumcoke/translator.js
 
 DEBUG_BUILD_FILES = \
 	debug/rumcoke/parser.js \
 	debug/rumcoke/translator.js
 
+# Make debug build
 default: $(DEBUG_BUILD_FILES)
 
 debug/rumcoke/parser.js: debug/rumcoke.js lib/rumcoke/parser.jison
@@ -17,6 +18,7 @@ debug/rumcoke/translator.js: lib/rumcoke/translator.rmk
 debug/rumcoke.js: lib/rumcoke.js
 	cp -r lib/ debug/
 
+# Make release build (lib/*)
 accept: $(DEBUG_BUILD_FILES)
 	node test.js --debug && \
 	  cp debug/rumcoke/translator.js lib/rumcoke/translator.js && \
@@ -25,8 +27,10 @@ accept: $(DEBUG_BUILD_FILES)
 	  touch debug/rumcoke/translator.rmk && \
 	  node test.js --debug
 
+# Run ./a.rmk with debug build
 debug: $(DEBUG_BUILD_FILES)
 	./bin/rumcoke a.rmk --debug
 
+# Run test
 test: $(DEBUG_BUILD_FILES)
 	node test.js --debug
