@@ -45,11 +45,6 @@ Usage
     $ ./rumcoke hello.rmk | node
     Hello, world!
 
-Run test
---------
-
-    $ make test    ;=> OK if no error is shown
-
 Documents
 ---------
 
@@ -104,6 +99,19 @@ See translator.rmk for more.
 TODO
 * for, while
 * try-catch
+
+Development
+-----------
+
+1. modify parser or translator
+
+2.  Run test
+
+    $ make test    ;=> OK if no error is shown
+
+3. Run `make accept` to build lib/*
+
+4. Commit
 
 Why?
 ----
