@@ -87,6 +87,12 @@ Converted to JS `===`
     (while expr
       body...)
 
+`for`
+-----
+
+    (for (set! j 0) (< j nphi) (inc! j)
+    ;=> for(j=0; j<nphi; j++)
+
 `break`
 -------
 
@@ -111,6 +117,14 @@ TODO: Do we need break with label?
 
     (raw-js-ast (type: "Literal" value: 7))  ;=> 7
 
+operators
+---------
+
+`+` `-` `*` `/`
+
+`<` `<=` `>` `>=`
+
+`inc!`(`++`) `dec!`(`--`)
 
 Predefined macros
 =================
@@ -124,14 +138,12 @@ Predefined macros
 TODO
 ====
 
+* mod?
 * `&` `|` `^` `~` `<<` `>>` `>>>`
   (In R6RS they are named bitwise-and, -ior, -xor, -not, bitwise-arithmetic-shift-left, -right. R6RS seems not to have `>>>`)
 * `case` (Convert to `switch`. Currently a macro, but should be a special-form)
 * `return` `continue`
 * `try .. catch`
-* `inc!`, `dec!` (`++`, `--`)
-
-* `for`? (Do you need it?)
 
 * `this` (Currently handled as variable reference, but should be ThisExpression)
 
