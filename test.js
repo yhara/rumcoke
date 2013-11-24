@@ -129,6 +129,7 @@ test("(set! x.y.z ab.cd.ef)", "x.y.z = ab.cd.ef");
 test("(aset! x y 1)", "x[y] = 1");
 test("(new Date 2012 1 1)", "new Date(2012, 1, 1)");
 test("(~ a b)", "a[b]");
+test("(~ a b c)", "a[b][c]");
 test("(array 1 2)", "[1,2]");
 // test(quote
 test("(= x 1)", "x === 1");

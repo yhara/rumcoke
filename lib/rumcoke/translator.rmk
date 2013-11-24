@@ -172,12 +172,15 @@
         right: (convert-value (~ v 3)))))
 
    ; (~ ary 0)
+   ; (~ ary 0 1 2)  ;=> ary[0][1][2]
    "~": (^(v)
-    (raise-if (not (= v.length 3)) "mailformed ~")
-    (ast "MemberExpression"
-      (computed: #t
-       object: (convert-value (~ v 1))
-       property: (convert-value (~ v 2)))))
+    (raise-if (< v.length 3) (msg: "mailformed ~" v: v))
+    (_.reduce (v.slice 2) (^(a b)
+                (ast "MemberExpression"
+                  (computed: #t
+                   object: a
+                   property: (convert-value b))))
+              (convert-value (~ v 1))))
 
    ; (new Foo 1)
    "new": (^(v)
