@@ -144,6 +144,7 @@ test("(not x)", "!x");
 test("(while 1 (f))", "while(1){ f(); }");
 test("(while 1 (f) (g))", "while(1){ f(); g(); }");
 test("(while 1 (break))", "while(1){ break }");
+test("(for (set! i 0) (< i 3) (inc! i) 1)", "for(i=0; i<3; i++){ 1 }");
 test("(throw x)", "throw x");
 test("(instance? x y)", "x instanceof y");
 test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");

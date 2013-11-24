@@ -74,12 +74,15 @@
     (ast "ExpressionStatement" (expression: inner-ast))
     inner-ast))
 
+; Convert rum-expression `v` to statement
 (define (convert-stmt v)
   (statement-expr (convert-node v)))
 
+; Convert rum-expressions `vs` to Array of statement
 (define (convert-stmts vs)
   (_.map vs convert-stmt))
 
+; Create a BlockStatement, ends with a value
 (define (block-stmt-with-return body-exprs)
   (ast "BlockStatement"
     (body: (body-exprs.map (^(body-item idx)
@@ -277,6 +280,17 @@
        (wrap-with-function-call while-stmt)
        while-stmt))
 
+   ; (for expr1 expr2 expr3 body...)
+   "for": (^(v)
+     (raise-if (< v.length 4) (msg: "malformed for" v: v))
+     (ast "ForStatement"
+       (init: (convert-node (~ v 1))
+        test: (convert-value (~ v 2))
+        update: (convert-node (~ v 3))
+        body: 
+          (ast "BlockStatement"
+            (body: (convert-stmts (v.slice 4)))))))
+
    ; (break)
    "break": (^(v)
      ; TODO: should warn if argument is given
@@ -349,9 +363,7 @@
          left: a
          right: b))))))))
 
-(define (convert-value v)
-  (convert-node v #t))
-
+; Convert rum-expression `v` to JS ast
 (define (convert-node v value-needed?)
   (cond
     ((or (_.number? v) (_.string? v) (_.reg-exp? v)
@@ -388,6 +400,11 @@
     (else
       (raise "Misplaced JS object" (js_object: v)))))
 
+; Convert rum-expression `v` to JS ast (value context)
+(define (convert-value v)
+  (convert-node v #t))
+
+; Expand unquote/unquote-splicing in `a`
 (define (expand-qq a)
   (if (not (_.array? a))
     a
