@@ -47,7 +47,7 @@ function repl(){
 // FIXME: should use option parsing library
 if(process.argv[2] && process.argv[2] != "--debug") {
   exprs = RumCoke.Parser.parser.parse(fs.readFileSync(process.argv[2], "utf8"));
-  util.puts(RumCoke.Translator.translate(exprs));
+  RumCoke.Translator.translate(exprs, util.puts);
 }
 else {
   repl();
