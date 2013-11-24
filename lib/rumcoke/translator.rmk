@@ -300,6 +300,22 @@
         left: (convert-value (~ v 1))
         right: (convert-value (~ v 2)))))
 
+   ; (inc! x)
+   "inc!": (^(v)
+     (raise-if (not (= v.length 2)) (msg: "malformed inc!" v: v))
+     (ast "UpdateExpression"
+       (operator: "++"
+        argument: (convert-value (~ v 1))
+        prefix: #f)))
+
+   ; (dec! x)
+   "dec!": (^(v)
+     (raise-if (not (= v.length 2)) (msg: "malformed dec!" v: v))
+     (ast "UpdateExpression"
+       (operator: "--"
+        argument: (convert-value (~ v 1))
+        prefix: #f)))
+
    ; (raw-js-ast (ast "FooStatement" ...))
    "raw-js-ast": (^(v)
      (raise-if (not (= v.length 2)) "malformed raw-js-ast")

@@ -147,6 +147,8 @@ test("(while 1 (break))", "while(1){ break }");
 test("(throw x)", "throw x");
 test("(instance? x y)", "x instanceof y");
 test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
+test("(inc! x)", "x++");
+test("(dec! x.y)", "x.y--");
 
 test('(raw-js-ast (type: "Literal" value: 7))', "7");
 
