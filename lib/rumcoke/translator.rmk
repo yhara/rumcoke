@@ -44,6 +44,9 @@
   (aset! info "type" typename)
   info)
 
+; Create VariableDeclaration
+; left :: variable name
+; rest :: value
 (define (convert-defvar left rest)
   (define init (if (= rest.length 0)
                  null
@@ -56,6 +59,8 @@
                                   (id: (convert-node left)
                                    init: init))))))
 
+; Wrap inner-ast with `(function(){ ... })()`
+; (Used to convert a statement to expression)
 (define (wrap-with-function-call inner-ast)
   (ast "CallExpression"
     (arguments: (array)
@@ -69,6 +74,8 @@
                 generator: #f
                 expression: #f)))))
 
+; Create ExpressionStatement if `inner-ast` has a value.
+; Just return `inner-ast` otherwise 
 (define (statement-expr inner-ast)
   (if (.. inner-ast type (match #/Literal|Expression|Identifier$/))
     (ast "ExpressionStatement" (expression: inner-ast))
@@ -91,6 +98,7 @@
                                  (argument: (convert-value body-item)))
                                (convert-stmt body-item)))))))
 
+; Create FunctionExpression, ends with return
 (define (function-with-return params-ary defaults body-exprs)
   (ast "FunctionExpression"
     (params: (_.map params-ary
@@ -104,11 +112,13 @@
      generator: #f
      expression: #f)))
 
+; Convert function definition to VariableDeclaration (var f = function...)
+; left :: (f x)
+; rest :: function body
 (define (convert-defun left rest)
   (define fname (~ left 0))
   (define params (left.slice 1))
   (raise-if (not (symbol? fname)) "malformed defun")
-  
   (ast "VariableDeclaration"
     (kind: "var"
      declarations: (array (ast "VariableDeclarator"
@@ -304,7 +314,6 @@
      (if value-needed?
        (wrap-with-function-call throw-stmt)
        throw-stmt))
-
    
    ; (instance? x Foo)
    "instance?": (^(v)
