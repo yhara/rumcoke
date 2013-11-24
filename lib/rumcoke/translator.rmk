@@ -77,7 +77,7 @@
 ; Create ExpressionStatement if `inner-ast` has a value.
 ; Just return `inner-ast` otherwise 
 (define (statement-expr inner-ast)
-  (if (.. inner-ast type (match #/Literal|Expression|Identifier$/))
+  (if (inner-ast.type.match #/Literal|Expression|Identifier$/)
     (ast "ExpressionStatement" (expression: inner-ast))
     inner-ast))
 
@@ -89,16 +89,22 @@
 (define (convert-stmts vs)
   (_.map vs convert-stmt))
 
-; Create a BlockStatement, ends with a value
+; Create a BlockStatement which ends with ReturnStatement
+; (except when the last expression cannot have value.)
 (define (block-stmt-with-return body-exprs)
   (ast "BlockStatement"
     (body: (body-exprs.map (^(body-item idx)
-                             (if (= idx (- body-exprs.length 1))
-                               (ast "ReturnStatement"
-                                 (argument: (convert-value body-item)))
-                               (convert-stmt body-item)))))))
+             (if (= idx (- body-exprs.length 1))
+               (begin
+                 (define noval-ast (convert-node body-item))
+                 (if (noval-ast.type.match #/ForStatement|ThrowStatement|WhileStatement/)
+                   noval-ast
+                   (ast "ReturnStatement"
+                      (argument: (convert-value body-item)))))
+               (convert-stmt body-item)))))))
 
-; Create FunctionExpression, ends with return
+; Create FunctionExpression which ends with return
+; (except when the last expression cannot have value.)
 (define (function-with-return params-ary defaults body-exprs)
   (ast "FunctionExpression"
     (params: (_.map params-ary
@@ -307,13 +313,10 @@
      (ast "BreakStatement" (label: null)))
 
    ; (throw x)
-   "throw": (^(v value-needed?)
+   "throw": (^(v)
      (raise-if (not (= v.length 2)) "malformed throw")
-     (define throw-stmt (ast "ThrowStatement"
-                          (argument: (convert-value (~ v 1)))))
-     (if value-needed?
-       (wrap-with-function-call throw-stmt)
-       throw-stmt))
+     (ast "ThrowStatement"
+       (argument: (convert-value (~ v 1)))))
    
    ; (instance? x Foo)
    "instance?": (^(v)
