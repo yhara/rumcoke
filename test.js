@@ -124,6 +124,7 @@ test("((^(x) x))", "(function(x){ return x })()");
 test("(.. a b)", "a.b");
 test("(.. a (b 1))", "a.b(1)");
 test("(set! x 1)", "x = 1");
+test("(set! x.y 1)", "x.y = 1");
 test("(aset! x y 1)", "x[y] = 1");
 test("(new Date 2012 1 1)", "new Date(2012, 1, 1)");
 test("(~ a b)", "a[b]");
