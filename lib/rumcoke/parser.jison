@@ -1,6 +1,7 @@
 /* -- JavaScript code -- */
 %{
 
+//var _ = require("underscore");
 var RumExpr = require('./rum_expr');
 var Sym = RumExpr.Sym;
 
@@ -49,7 +50,7 @@ rmk_ident {alpha_d}[-_a-zA-Z0-9\$]*[\!\?]?
 ">="            return "IDENT";
 [-+*/<>%=^\|~]  return "IDENT";
 ".."  return "IDENT";
-{rmk_ident}"."{rmk_ident}         return "PROPREF";
+{rmk_ident}("."{rmk_ident})+         return "PROPREF";
 {js_ident}*":"                   return "KEYWORD";
 '"'[^"]*'":'                     return "STR_KEYWORD";
 {rmk_ident}                      return "IDENT";
@@ -152,10 +153,12 @@ object
     | STR_KEYWORD { $$ = yytext.slice(1, -2); }
     ;
 
+// x.y
+// x.y.z
 propref
   : PROPREF
-    { var _tmp = yytext.match(/(.+)\.(.+)/);
-      $$ = [Sym(".."), Sym(_tmp[1]), Sym(_tmp[2])]; }
+    { var _tmp = yytext.split(/\./).map(Sym);
+      $$ = [Sym("..")].concat(_tmp); }
   ;
 
 quoted

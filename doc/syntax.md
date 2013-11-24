@@ -43,6 +43,14 @@ May contain `\'` `\"` `\b` `\f` `\n` `\r` `\t` `\v` `\\`
 
 `(a: 1)`
 
+### property reference
+
+`x.y.z`
+
+This can be left hand side of `set!`
+
+    (set! x.y.z 1)
+
 ### quote
 
 `'foo`
