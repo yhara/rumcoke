@@ -8,10 +8,14 @@ Special forms
 
     (define (f x) (+ x 1))
 
+Value: Currently, definitions does not have value (may change in the future).
+
 `^`
 ---
 
-    (^(x) (+ x 1))
+    (^(x) (+ x 1))  ;=> function(x){ return x+1; }
+
+Value: JS function
 
 `..`
 ----
@@ -24,28 +28,36 @@ Special forms
 
 Note: I feel this is cryptic :-(
 
+Value: result of property reference or method call
+
 `set!`
 ------
 
     (set! x 1)  ;=> x = 1
 
+Value: the updated value
+
 `aset!`
 -------
 
-    (aset! x "foo" 1)  ;=> x["foo"] = 1
+    (aset! x.y 1)  ;=> x.y = 1
+    (aset! x key 1)  ;=> x[key] = 1
 
-
-Note: maybe `(set! x.foo 1)` and `(set! x[key] 1)` are better?
+Value: the updated value
 
 `~`
 ---
 
     (~ ary 0)  ;=> ary[0]
 
+Value: result of array/object indexing
+
 `new`
 -----
 
     (new Date 2013 1 1)  ;=> new Date(2013, 1, 1);
+
+Value: newly created JS object
 
 `array`
 -------
@@ -54,6 +66,8 @@ Like `list` in Lisp. Converted to JS array literal
 
     (array 1 2 3)  ;=> [1,2,3]
 
+Value: JS array
+
 `=`
 ---
 
@@ -61,11 +75,14 @@ Converted to JS `===`
 
     (= x y)  ;=> x === y
 
+Value: boolean
 
 `if`
 ----
 
     (if x y z)
+
+Value: y or z
 
 `begin`
 -------
@@ -74,6 +91,8 @@ Converted to JS `===`
       (begin (f) (g))
       (begin (h) (i)))
 
+Value: last value in `begin`
+
 `and`, `or`, `not`
 ------------------
 
@@ -81,17 +100,23 @@ Converted to JS `===`
     (or x y)   ;=> x || y
     (not x)    ;=> !x
 
+Value: result of logical operation
+
 `while`
 -------
 
     (while expr
       body...)
 
+`while` does not have a value.
+
 `for`
 -----
 
     (for (set! j 0) (< j nphi) (inc! j)
     ;=> for(j=0; j<nphi; j++)
+
+`for` does not have a value.
 
 `break`
 -------
@@ -100,15 +125,21 @@ Converted to JS `===`
 
 TODO: Do we need break with label?
 
+`break` does not have a value.
+
 `throw`
 -------
 
     (throw x)  ;=> throw x;
 
+`throw` does not have a value.
+
 `instance?`
 -----------
 
     (instance? x String)   ;=> x instanceof String
+
+Value: boolean
 
 `raw-js-ast`
 ------------
