@@ -53,6 +53,11 @@ See [doc/index.md](https://github.com/yhara/rumcoke/blob/master/doc/index.md)
 Cheat Sheet
 -----------
 
+Naming rules
+
+* `convert-defvar` => `convertDefvar`
+* `array?` => `isArray`
+
 Variable
 
 * `(define a 1)` => `var a=1;`
