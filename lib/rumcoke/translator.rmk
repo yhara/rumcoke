@@ -451,10 +451,12 @@
       a)))
 
 (define macros
+  ; (quote expr)
   ("quote": (^(v) 
     (raise-if (not (= v.length 2)) "malformed quote")
     (_quote (~ v 1)))
 
+  ; (case a ((b c) d) (else e))
   "case": (^(v)
     (array 'raw-js-ast
       (ast "SwitchStatement"
@@ -482,6 +484,7 @@
                             (convert-stmts body)
                             (ast "BreakStatement" (label: null)))))))))))))))
 
+  ; (cond (a b) (c d) (else e))
   "cond": (^(v)
     (raise-if (= v.length 1)
               "at least one clause is required for cond")
@@ -507,6 +510,7 @@
 
       #undefined))
 
+  ; (when test body...)
   "when": (^(v)
     (array 'if
            (~ v 1)
@@ -518,6 +522,8 @@
      (expand-qq (~ v 1)))
   ))
    
+; Expand macros in rum-expression `v`
+; mod :: modifided flag (just pass undefined for first call)
 (define (expand-macros v mod)
   (or mod (set! mod (new Object)))
   (define (expand-inner x)

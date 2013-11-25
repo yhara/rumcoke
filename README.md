@@ -108,9 +108,17 @@ See translator.rmk for more.
 Development
 -----------
 
+RumCoke is a self-hosted compiler, so you need a working RumCoke compiler
+to compile translator.rmk. For this purpose lib/rumcoke/translator.js is
+commited in repository. 
+
+When you run `make`, it will build translator.js under debug/, so that
+we always have 'previous working version' in a working copy. `make accept`
+will copy this debug build to lib/.
+
 1. modify parser or translator
 
-2.  Run test
+2. Run test
 
     $ make test    ;=> OK if no error is shown
 

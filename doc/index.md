@@ -10,5 +10,7 @@ Language
 
 [Special Forms](special_forms.md)
 
+[Predeifned macros](predef_macros.md)
+
 [Syntax](syntax.md)
 
