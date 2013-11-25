@@ -105,10 +105,6 @@ Underscore.js
 
 See translator.rmk for more.
 
-TODO
-* for, while
-* try-catch
-
 Development
 -----------
 

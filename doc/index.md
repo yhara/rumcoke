@@ -1,14 +1,14 @@
 Documents
 =========
 
-[Incompatible Changes](UPGRADE.mkd) RumCoke is in early development stage.
+[Incompatible Changes](UPGRADE.md) RumCoke is in early development stage.
 
 Language
 --------
 
-[Rum Expression](rum_expr.mkd)
+[Rum Expression](rum_expr.md)
 
-[Special Forms](special_forms.mkd)
+[Special Forms](special_forms.md)
 
 [Syntax](syntax.md)
 
