@@ -177,6 +177,11 @@ test("(~ (quote x) 0)", "Sym('x')[0]");
 test("(array (quote x))", "[Sym('x')]");
 test("(= (quote x) y)", "Sym('x') === y");
 //test("(if (quote x) (quote y) z)", "if(Sym('x')){ Sym('y') }else z");
+test("(case a ((b c) d) )", 'switch(a){ case b: case c: d; break; }');
+test("(case a (else c))", 'switch(a){ default: c; }');
+test("(print (case a (else c)))", 'print((function(){ \
+                                            switch(a){ default: return c; }\
+                                          })())');
 test("(begin (quote x))", "{Sym('x')}");
 test("(and (quote x) y)", "Sym('x') && y");
 test("(or (quote x) y)", "Sym('x') || y");
@@ -187,8 +192,6 @@ test("(throw (quote x))", "throw(Sym('x'))");
 // Macros
 test("(quote x)", "Sym('x')");
 test("(quote (x y))", "[Sym('x'), Sym('y')]");
-test('(case a ((b c) d) )', 'switch(a){ case b: case c: d; break; }');
-test('(case a (else c))', 'switch(a){ default: c; }');
 testm("(when x y z)", "(if x (begin y z) #undefined)");
 testm("(unless x y z)", "(if x #undefined (begin y z))");
 

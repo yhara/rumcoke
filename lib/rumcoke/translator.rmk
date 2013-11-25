@@ -70,39 +70,49 @@
 (define (convert-stmt v)
   (statement-expr (convert-node v)))
 
-; Convert rum-expressions `vs` to Array of statement
+; Returns array of statement
 (define (convert-stmts vs)
   (_.map vs convert-stmt))
+
+; Returns array of statement, with `return` inserted to last statement
+; (except when the last expression cannot have value.)
+(define (stmts-with-return body-exprs)
+  (body-exprs.map (^(body-item idx)
+    (if (= idx (- body-exprs.length 1))
+      (begin
+        (define noval-ast (convert-node body-item))
+        (if (noval-ast.type.match #/ForStatement|ThrowStatement|WhileStatement/)
+          noval-ast
+          (ast "ReturnStatement"
+             (argument: (convert-value body-item)))))
+      (convert-stmt body-item)))))
 
 ; Create a BlockStatement which ends with ReturnStatement
 ; (except when the last expression cannot have value.)
 ; Used by named/unnamed functions and `begin`.
 (define (block-stmt-with-return body-exprs)
   (ast "BlockStatement"
-    (body: (body-exprs.map (^(body-item idx)
-             (if (= idx (- body-exprs.length 1))
-               (begin
-                 (define noval-ast (convert-node body-item))
-                 (if (noval-ast.type.match #/ForStatement|ThrowStatement|WhileStatement/)
-                   noval-ast
-                   (ast "ReturnStatement"
-                      (argument: (convert-value body-item)))))
-               (convert-stmt body-item)))))))
+    (body: (stmts-with-return body-exprs))))
 
-; Create FunctionExpression which ends with return
-; (except when the last expression cannot have value.)
-(define (function-with-return params-ary defaults body-exprs)
+; Create FunctionExpression 
+(define (function-expression params-ary defaults body)
   (ast "FunctionExpression"
-    (params: (_.map params-ary
-                    (^(param)
-                      (raise-if (not (symbol? param)) "malformed defun param")
-                      (convert-node param)))
+    (params: (_.map params-ary (^(param)
+               (raise-if (not (symbol? param)) "malformed defun param")
+               (convert-node param)))
      defaults: defaults
-     body: (block-stmt-with-return body-exprs)
+     body: body
      id: null
      rest: null
      generator: #f
      expression: #f)))
+
+; Create FunctionExpression which ends with return
+; (except when the last expression cannot have value.)
+(define (function-with-return params-ary defaults body-exprs)
+  (function-expression params-ary
+                       defaults
+                       (block-stmt-with-return body-exprs))) 
 
 ; Convert function definition to VariableDeclaration (var f = function...)
 ; left :: (f x)
@@ -225,30 +235,39 @@
 
    ; (case a ((b c) d) (else e))
    "case": (^(v value-needed?)
-     (ast "SwitchStatement"
-       (discriminant: (convert-value (~ v 1))
-        cases:
-          (flat-map (v.slice 2) (^(clause)
-            (define cases (~ clause 0))
-            (if (= 'else cases)
-              (ast "SwitchCase"
-                (test: #null    ; else clause does not have `test`
-                 consequent: (convert-stmts (clause.slice 1))))
-              (begin
-                (define last-test (cases.pop))
-                (define body (clause.slice 1))
-                (append
-                  (_.map cases (^(test)             ; n bodyless cases
-                    (ast "SwitchCase"
-                      (test: (convert-value test)
-                       consequent: (array)))))
-                  (array                            ; 1 case with body
-                    (ast "SwitchCase"
-                      (test: (convert-value last-test)
-                       consequent:
-                         (append
-                           (convert-stmts body)
-                           (ast "BreakStatement" (label: null))))))))))))))
+     (define body-converter (if value-needed? stmts-with-return convert-stmts))
+     (define switch-ast
+       (ast "SwitchStatement"
+         (discriminant: (convert-value (~ v 1))
+          cases:
+            (flat-map (v.slice 2) (^(clause)
+              (define cases (~ clause 0))
+              (if (= 'else cases)
+                (ast "SwitchCase"
+                  (test: #null    ; else clause does not have `test`
+                   consequent: (body-converter (clause.slice 1))))
+                (begin
+                  (define last-test (cases.pop))
+                  (define body (clause.slice 1))
+                  (append
+                    (_.map cases (^(test)             ; n bodyless cases
+                      (ast "SwitchCase"
+                        (test: (convert-value test)
+                         consequent: (array)))))
+                    (array                            ; 1 case with body
+                      (ast "SwitchCase"
+                        (test: (convert-value last-test)
+                         consequent:
+                           (append
+                             (body-converter body)
+                             (ast "BreakStatement" (label: null))))))))))))))
+     (if value-needed?
+       (ast "CallExpression"
+         (arguments: (array)
+          callee: (function-expression (array) (array)
+                                       (ast "BlockStatement"
+                                         (body: (array switch-ast))))))
+       switch-ast))
 
    ; (begin ...)
    "begin": (^(v value-needed?)

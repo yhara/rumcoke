@@ -91,7 +91,9 @@ Value: y or z
       ((1) (print "one"))
       ((2 3) (print "two or three"))
       (else (print "other")))
-    ;=> Converted to JS switch-case
+    ;=> Converted to JS switch-case-default
+
+Value: last value of each clause
 
 `begin`
 -------
