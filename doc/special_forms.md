@@ -84,6 +84,15 @@ Value: boolean
 
 Value: y or z
 
+`case`
+------
+
+    (case x
+      ((1) (print "one"))
+      ((2 3) (print "two or three"))
+      (else (print "other")))
+    ;=> Converted to JS switch-case
+
 `begin`
 -------
 

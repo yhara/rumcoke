@@ -237,6 +237,33 @@
             consequent: (convert-stmt (~ v 2))
             alternate: (convert-stmt (~ v 3)))))))
 
+   ; (case a ((b c) d) (else e))
+   "case": (^(v value-needed?)
+     (ast "SwitchStatement"
+       (discriminant: (convert-value (~ v 1))
+        cases:
+          (flat-map (v.slice 2) (^(clause)
+            (define cases (~ clause 0))
+            (if (= 'else cases)
+              (ast "SwitchCase"
+                (test: #null    ; else clause does not have `test`
+                 consequent: (convert-stmts (clause.slice 1))))
+              (begin
+                (define last-test (cases.pop))
+                (define body (clause.slice 1))
+                (append
+                  (_.map cases (^(test)             ; n bodyless cases
+                    (ast "SwitchCase"
+                      (test: (convert-value test)
+                       consequent: (array)))))
+                  (array                            ; 1 case with body
+                    (ast "SwitchCase"
+                      (test: (convert-value last-test)
+                       consequent:
+                         (append
+                           (convert-stmts body)
+                           (ast "BreakStatement" (label: null))))))))))))))
+
    ; (begin ...)
    "begin": (^(v value-needed?)
      (if value-needed?
@@ -458,34 +485,6 @@
     (raise-if (not (= v.length 2)) "malformed quote")
     (_quote (~ v 1)))
 
-  ; (case a ((b c) d) (else e))
-  "case": (^(v)
-    (array 'raw-js-ast
-      (ast "SwitchStatement"
-        (discriminant: (translate-expr (~ v 1))
-         cases:
-           (flat-map (v.slice 2) (^(clause)
-             (define cases (~ clause 0))
-             (if (= 'else cases)
-               (ast "SwitchCase"
-                 (test: #null
-                  consequent: (convert-stmts (clause.slice 1))))
-               (begin
-                 (define last-test (cases.pop))
-                 (define body (clause.slice 1))
-                 (append
-                   (_.map cases (^(test)
-                     (ast "SwitchCase"
-                       (test: (translate-expr test)
-                        consequent: (array)))))
-                   (array
-                     (ast "SwitchCase"
-                       (test: (translate-expr last-test)
-                        consequent:
-                          (append
-                            (convert-stmts body)
-                            (ast "BreakStatement" (label: null)))))))))))))))
-
   ; (cond (a b) (c d) (else e))
   "cond": (^(v)
     (raise-if (= v.length 1)
@@ -590,13 +589,13 @@
       ; Literals
       v)))
 
-; Convert rum-expr to JS ast
+; Convert rum-expr to JS ast (includes macro expansion)
 (define (translate-expr expr)
   (define expanded (expand-macros expr))
   ;(d "Macro expansion: " (before: expr after: expanded))
   (convert-node expanded))
 
-; Convert rum-expressions to JS string
+; Compile rum-expressions to JS string
 ; Returns `undefined` when _putter is given
 (define (translate exprs _putter)
   (define ret "")
