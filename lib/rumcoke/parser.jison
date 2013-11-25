@@ -84,7 +84,6 @@ expr
   | number
   | string
   | regexp
-  | vector
   | array
   | object
   | propref
@@ -127,10 +126,6 @@ string
 
 regexp
   : REGEXP { $$ = new RegExp(yytext.slice(2, -1)); }
-  ;
-
-vector
-  : "#(" exprs ")" { $$ = ["vector", $2]; }
   ;
 
 array
