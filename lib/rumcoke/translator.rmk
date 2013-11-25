@@ -247,16 +247,17 @@
                   (test: #null    ; else clause does not have `test`
                    consequent: (body-converter (clause.slice 1))))
                 (begin
-                  (define last-test (cases.pop))
+                  (define init-cases (_.initial cases))
+                  (define last-case  (_.last cases))
                   (define body (clause.slice 1))
                   (append
-                    (_.map cases (^(test)             ; n bodyless cases
+                    (_.map init-cases (^(test)        ; n bodyless cases
                       (ast "SwitchCase"
                         (test: (convert-value test)
                          consequent: (array)))))
                     (array                            ; 1 case with body
                       (ast "SwitchCase"
-                        (test: (convert-value last-test)
+                        (test: (convert-value last-case)
                          consequent:
                            (append
                              (body-converter body)
