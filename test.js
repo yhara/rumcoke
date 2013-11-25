@@ -187,9 +187,10 @@ test("(throw (quote x))", "throw(Sym('x'))");
 // Macros
 test("(quote x)", "Sym('x')");
 test("(quote (x y))", "[Sym('x'), Sym('y')]");
-//test("(when x y z)", "if(x){ y; z; }");
 test('(case a ((b c) d) )', 'switch(a){ case b: case c: d; break; }');
 test('(case a (else c))', 'switch(a){ default: c; }');
+testm("(when x y z)", "(if x (begin y z) #undefined)");
+testm("(unless x y z)", "(if x #undefined (begin y z))");
 
 testm("`(a b)", '(append (array (Sym "a")) (array (Sym "b")))');
 testm("`(,a ,b)", '(append (array a) (array b))');

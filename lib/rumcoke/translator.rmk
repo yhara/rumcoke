@@ -514,14 +514,21 @@
 
   ; (when test body...)
   "when": (^(v)
-    (array 'if
-           (~ v 1)
-           (cons 'begin (v.slice 2))
-           undefined))
+    `(if ,(~ v 1)
+       (begin ,@(v.slice 2))
+       #undefined))
 
-   "quasiquote": (^(v)
-     (raise-if (not (= v.length 2)) "malformed quasiquote")
-     (expand-qq (~ v 1)))
+  ; (unless test body...)
+  "unless": (^(v)
+    `(if ,(~ v 1)
+       #undefined
+       (begin ,@(v.slice 2))))
+
+  ; (quasiquote a (unquote b) (unquote-splicing c))
+  ; `(a ,b ,@c)
+  "quasiquote": (^(v)
+    (raise-if (not (= v.length 2)) "malformed quasiquote")
+    (expand-qq (~ v 1)))
   ))
    
 ; Expand macros in rum-expression `v`
