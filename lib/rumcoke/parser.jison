@@ -46,6 +46,8 @@ rmk_ident {alpha_d}[-_a-zA-Z0-9\$]*[\!\?]?
 ",@"  return ",@";
 ","   return ",";
 
+[0-9]+("."[0-9]+)?\b     return "POSITIVE_NUMBER";
+"-"[0-9]+("."[0-9]+)?\b  return "NEGATIVE_NUMBER";
 "<="            return "IDENT";
 ">="            return "IDENT";
 [-+*/<>%=^\|~]  return "IDENT";
@@ -54,7 +56,6 @@ rmk_ident {alpha_d}[-_a-zA-Z0-9\$]*[\!\?]?
 {js_ident}*":"                   return "KEYWORD";
 '"'[^"]*'":'                     return "STR_KEYWORD";
 {rmk_ident}                      return "IDENT";
-[0-9]+("."[0-9]+)?\b  return "NUMBER";
 '"'[^"]*'"'           return "STRING";
 "#/"[^/]*"/"          return "REGEXP";
 <<EOF>>   return "EOF";
@@ -106,7 +107,8 @@ boolean
   ;
 
 number
-  : NUMBER { $$ = Number(yytext); }
+  : POSITIVE_NUMBER { $$ = Number(yytext); }
+  | NEGATIVE_NUMBER { $$ = [Sym("-"), -Number(yytext)]; }
   ;
 
 string

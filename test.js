@@ -5,6 +5,9 @@
 // $ node test.js
 // should show nothing.
 
+// Options
+var PRINT_CASES = false;
+
 var util = require("util"),
     fs = require("fs"),
     _ = require("underscore"),
@@ -73,6 +76,10 @@ function isEqv(a, b){
 };
 
 function test(rum_code, js_code){
+  if (PRINT_CASES) {
+    util.puts("test | "+rum_code+" | "+js_code+" |");
+  }
+
   var expected_ast = esprima.parse(js_code)["body"][0];
   if (expected_ast.type == "ExpressionStatement")
     expected_ast = expected_ast.expression;
@@ -110,7 +117,10 @@ test("#t", "true");
 test("#f", "false");
 test("#null", "null");
 test("#undefined", "void 0");
+test("3", "3");
+test("-3", "-3");
 test("7.65", "7.65");
+test("-5.73", "-5.73");
 test('"foo"', '"foo"');
 test('"\\n"', '"\\n"');
 test('"\\\\n"', '"\\\\n"');
@@ -157,9 +167,17 @@ test("(dec! x.y)", "x.y--");
 test('(raw-js-ast (type: "Literal" value: 7))', "7");
 
 test("(+ x y z)", "x + y + z");
+test("(+)", "0");
+test("(+ 3)", "3");
+test("(+ -3)", "-3");
 test("(- x y z)", "x - y - z");
+test("(- 3)", "-3");
 test("(* x y z)", "x * y * z");
+test("(*)", "1");
+test("(* 3)", "3");
+test("(* -3)", "-3");
 test("(/ x y z)", "x / y / z");
+test("(/ 3)", "1/3");
 test("(< x y z)", "x < y && y < z");
 test("(> x y z)", "x > y && y > z");
 test("(<= x y z)", "x <= y && y <= z");

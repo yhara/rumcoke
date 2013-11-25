@@ -27,6 +27,7 @@
   (or info (set! info (new Object)))
   (aset! info "ERROR" msg)
   (throw (util.inspect info)))
+
 (define (raise-if cond msg info)
   (when cond
     (raise msg info)))
@@ -35,7 +36,7 @@
   (_.flatten arguments true))
 
 (define (flat-map ls f)
-  (_.flatten (_.map ls f) true))
+  (_.flatten (_.map ls f) true))  ; true =shallow mode
 
 (define (cons obj ary)
   (append (array obj) ary))
@@ -80,7 +81,8 @@
   (body-exprs.map (^(body-item idx)
     (if (= idx (- body-exprs.length 1))
       (begin
-        (define noval-ast (convert-node body-item))
+        ; Try converting body with non-value context
+        (define noval-ast (convert-node body-item #f))
         (if (noval-ast.type.match #/ForStatement|ThrowStatement|WhileStatement/)
           noval-ast
           (ast "ReturnStatement"
@@ -144,6 +146,8 @@
     (raise-if (not (_.array? (~ v 1))) "malformed function literal params")
     (function-with-return (~ v 1) (array) (v.slice 2)))
 
+   ; (.. x foo bar)  => x.foo.bar
+   ; (.. x (foo 1))  => x.foo(1)
    "..": (^(v)
     (define receiver (~ v 1))
     (define call-specs (v.slice 2))
@@ -371,16 +375,68 @@
      (if (obj-expr? arg)
        (~ arg "content")
        arg))
+
+   ; Operators
+   "+": (^(v)
+     (case v.length
+       ((1) (ast "Literal" (value: 0)))
+       ((2) (convert-value (~ v 1)))
+       (else
+         (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
+           (ast "BinaryExpression"
+             (operator: "+"
+              left: a
+              right: b)))))))
+
+   "-": (^(v)
+     (case v.length
+       ((1) (raise (msg: "`-` needs at least one argument" v: v)))
+       ((2) (ast "UnaryExpression"
+              (operator: "-" argument: (convert-value (~ v 1)))))
+       (else
+         (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
+           (ast "BinaryExpression"
+             (operator: "-"
+              left: a
+              right: b)))))))
+
+   "*": (^(v)
+     (case v.length
+       ((1) (ast "Literal" (value: 1)))
+       ((2) (convert-value (~ v 1)))
+       (else
+         (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
+           (ast "BinaryExpression"
+             (operator: "*"
+              left: a
+              right: b)))))))
+
+   "/": (^(v)
+     (case v.length
+       ((1) (raise (msg: "`/` needs at least one argument" v: v)))
+       ((2) (ast "BinaryExpression"
+              (operator: "/"
+               left: (ast "Literal" (value: 1))
+               right: (convert-value (~ v 1)))))
+       (else
+         (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
+           (ast "BinaryExpression"
+             (operator: "/"
+              left: a
+              right: b)))))))
+
   ))
 
 ; Operators
-(_.each (array "+" "-" "*" "/") (^(op)
-  (aset! syntaxes op (^(v) 
-    (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
-      (ast "BinaryExpression"
-        (operator: op
-         left: a
-         right: b))))))))
+;(_.each (array "-" "/") (^(op)
+;  (aset! syntaxes op (^(v) 
+;    (raise-if (= v.length 1) (msg: (+ "malformed " op) v: v))
+;    (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
+;      (ast "BinaryExpression"
+;        (operator: op
+;         left: a
+;         right: b))))))))
+
 
 (_.each (array "<" "<=" ">" ">=") (^(op)
   (aset! syntaxes op (^(v) 
@@ -584,10 +640,13 @@
       ; Literals
       v)))
 
+(define $debug #f)
+
 ; Convert rum-expr to JS ast (includes macro expansion)
 (define (translate-expr expr)
   (define expanded (expand-macros expr))
   ;(d "Macro expansion: " (before: expr after: expanded))
+  (set! $debug expanded)
   (convert-node expanded))
 
 ; Compile rum-expressions to JS string
@@ -602,7 +661,6 @@
      (define ast (translate-expr expr))
      ;(when debug (util.puts (+ "ast: " (util.inspect ast #f null #t))))
      (putter (escodegen.generate ast))))
-
   (if putter
     #undefined
     ret))
