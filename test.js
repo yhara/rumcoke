@@ -16,8 +16,9 @@ if(_.contains(process.argv, "--debug")) {
   RumCoke = require("./debug/rumcoke");
 }
 
-var d = function (header, x) {
-  util.puts(header + util.inspect(x, false, null, true));
+// Print debug message to stderr
+var d = function (header, value) {
+  util.debug(header + util.inspect(value, false, null, true));
 };
 
 function isEqv(a, b){

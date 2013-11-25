@@ -13,14 +13,14 @@
 (define symbol? RumExpr.isSymbol)
 (define obj-expr? RumExpr.isObjExpr)
 
-; Print debug message
+; Print debug message to stderr
 ; (d value)
 ; (d "header:" value)
 (define (d arg1 arg2)
   (define header (if arg2 arg1 "debug: "))
   (define value (or arg2 arg1))
                     ;             obj   showHidden depth colors
-  (util.puts header (util.inspect value #f         null  #t))
+  (util.debug (+ header (util.inspect value #f         null  #t)))
   value)
 
 (define (raise msg info)
