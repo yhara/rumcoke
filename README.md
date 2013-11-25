@@ -126,6 +126,18 @@ will copy this debug build to lib/.
 
 4. Commit
 
+### Tips
+
+Sometimes you find bug in the 'previous woking version'. This case is pretty
+complecated because you are editing translator.rmk but there is a bug in
+another position of translator.rmk.
+
+In this case, you should:
+
+1. Stop developing the new feature 
+2. Make a minimal case to reproduce the error (save it in a.rmk)
+3. `git stash` and fix the bug first
+
 Why?
 ----
 
