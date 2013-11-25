@@ -59,21 +59,6 @@
                                   (id: (convert-node left)
                                    init: init))))))
 
-; Wrap inner-ast with `(function(){ ... })()`
-; (Used to convert a statement to expression)
-(define (wrap-with-function-call inner-ast)
-  (ast "CallExpression"
-    (arguments: (array)
-     callee: (ast "FunctionExpression"
-               (params: (array)
-                defaults: (array)
-                body: (ast "BlockStatement"
-                        (body: (array (statement-expr inner-ast))))
-                id: null
-                rest: null
-                generator: #f
-                expression: #f)))))
-
 ; Create ExpressionStatement if `inner-ast` has a value.
 ; Just return `inner-ast` otherwise 
 (define (statement-expr inner-ast)
