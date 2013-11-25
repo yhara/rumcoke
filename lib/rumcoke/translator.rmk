@@ -91,6 +91,7 @@
 
 ; Create a BlockStatement which ends with ReturnStatement
 ; (except when the last expression cannot have value.)
+; Used by named/unnamed functions and `begin`.
 (define (block-stmt-with-return body-exprs)
   (ast "BlockStatement"
     (body: (body-exprs.map (^(body-item idx)
@@ -269,14 +270,7 @@
      (if value-needed?
        (ast "CallExpression"
          (arguments: (array)
-          callee: (ast "FunctionExpression"
-                    (params: (array)
-                     defaults: (array)
-                     body: (block-stmt-with-return (v.slice 1))
-                     id: null
-                     rest: null
-                     generator: #f
-                     expression: #f))))
+          callee: (function-with-return (array) (array) (v.slice 1))))
        (ast "BlockStatement"
          (body: (_.map (v.slice 1) convert-stmt)))))
 
