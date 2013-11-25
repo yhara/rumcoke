@@ -313,15 +313,11 @@
         argument: (convert-value (~ v 1)))))
 
    ; (while expr ...)
-   ; TODO: should `while` have value in RumCoke? (currently does not)
-   "while": (^(v value-needed?)
-     (define while-stmt (ast "WhileStatement"
-                          (test: (convert-value (~ v 1))
-                           body: (ast "BlockStatement"
-                                   (body: (_.map (v.slice 2) convert-stmt))))))
-     (if value-needed?
-       (wrap-with-function-call while-stmt)
-       while-stmt))
+   "while": (^(v)
+     (ast "WhileStatement"
+       (test: (convert-value (~ v 1))
+        body: (ast "BlockStatement"
+                (body: (_.map (v.slice 2) convert-stmt))))))
 
    ; (for expr1 expr2 expr3 body...)
    "for": (^(v)
