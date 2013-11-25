@@ -420,27 +420,29 @@
 (define (expand-qq a)
   (if (not (_.array? a))
     a
-    ; Expand list
+    ; Expand items in list
     (cons 'append (a.map (^(x)
       (cond
-        ; (quasiquote ...)
-        ((= (~ x 0) 'quasiquote)
-          (raise "Nested quasiquote is not supported yet"))
-        ; ,foo
-        ((= (~ x 0) 'unquote)
-          `(array ,(~ x 1)))
-        ; ,@foo
-        ((= (~ x 0) 'unquote-splicing)
-         (~ x 1))
+        ((_.array? x)
+          (cond
+            ; (quasiquote ...)
+            ((= (~ x 0) 'quasiquote)
+              (raise "Nested quasiquote is not supported yet"))
+            ; ,foo
+            ((= (~ x 0) 'unquote)
+              `(array ,(~ x 1)))
+            ; ,@foo
+            ((= (~ x 0) 'unquote-splicing)
+              (~ x 1))
+            ; (foo bar)
+            (else
+              `(array ,(expand-qq x)))))
         ; foo
         ((symbol? x)
          `(array ',x))
-        ; (foo bar)
-        ((_.array? x)
-         `(array ,(expand-qq x)))
         ; Literal
         (else
-         x)))))))
+         `(array ,x))))))))
 
 ; Macro
 (define (_quote a)
