@@ -40,7 +40,6 @@ Install
 
     $ git clone https://github.com/yhara/rumcoke
     $ npm install
-    $ make
     $ ./bin/rumcoke hello.rmk | node
     Hello, world!
 
