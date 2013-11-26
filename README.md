@@ -15,11 +15,11 @@ Features
 * Traslated into (relatively) readable JavaScript 
 * Scheme-like syntax
 * Array based s-expression
-  * (1 2 3) is an array, not list
+  * '(1 2 3) is an array, not list
+* quasiquote
 
 TODO
 
-* quasiquote
 * Lisp style macro
 * Source Map
 
@@ -28,21 +28,20 @@ Example
 
 Hello World
 
-    (define util (require "util"))
-    (util.puts "Hello, world!")
+    (console.log "Hello, world!")
 
 Requirements
 ------------
 
-Node.js (tested with v0.8.14)
+Node.js (tested with v0.10.20)
 
-Usage
------
+Install
+-------
 
     $ git clone https://github.com/yhara/rumcoke
     $ npm install
-    $ ./node_modules/jison/lib/jison/cli-wrapper.js parser.jison
-    $ ./rumcoke hello.rmk | node
+    $ make
+    $ ./bin/rumcoke hello.rmk | node
     Hello, world!
 
 Documents
