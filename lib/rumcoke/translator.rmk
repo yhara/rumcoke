@@ -231,7 +231,8 @@
        (if (_.undefined? (~ v 3))
          (ast "IfStatement"
            (test: (convert-value (~ v 1))
-            consequent: (convert-stmt (~ v 2))))
+            consequent: (convert-stmt (~ v 2))
+            alternate: #null))
          (ast "IfStatement"
            (test: (convert-value (~ v 1))
             consequent: (convert-stmt (~ v 2))

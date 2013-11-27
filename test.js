@@ -144,8 +144,9 @@ test("(~ a b c)", "a[b][c]");
 test("(array 1 2)", "[1,2]");
 // test(quote
 test("(= x 1)", "x === 1");
-//test("(if x y z)", "if(x) y; else z"); // TODO: bug?
-//test("begin
+test("(if x y z)", "if(x) y; else z");
+test("(if x (begin 1))", "if(x){ 1 }");
+test("(f (if x (begin 1)))", "f(x ? (function(){return 1})() : void 0);");
 test("(and x y)", "x && y"); 
 test("(or)", "false"); 
 test("(or x)", "x || false"); 
