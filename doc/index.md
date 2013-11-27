@@ -14,3 +14,4 @@ Language
 
 [Syntax](syntax.md)
 
+[FAQ](faq.md)
