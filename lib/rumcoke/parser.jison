@@ -5,6 +5,19 @@
 var RumExpr = require('./rum_expr');
 var Sym = RumExpr.Sym;
 
+// Returns a string where "\\n" is replaced to "\n", etc. 
+function substituteEscapes(str){
+  return str.replace(/(^|\b|[^\\])\\'/g, "$1'")
+            .replace(/(^|\b|[^\\])\\"/g, '$1"')
+            .replace(/(^|\b|[^\\])\\b/g, "$1\b")
+            .replace(/(^|\b|[^\\])\\f/g, "$1\f")
+            .replace(/(^|\b|[^\\])\\n/g, "$1\n")
+            .replace(/(^|\b|[^\\])\\r/g, "$1\r")
+            .replace(/(^|\b|[^\\])\\t/g, "$1\t")
+            .replace(/(^|\b|[^\\])\\v/g, "$1\v")
+            .replace(/\\\\/g, "\\");
+}
+
 %}
 
 /* -- Lex -- */
@@ -112,18 +125,7 @@ number
   ;
 
 string
-  : STRING {
-      $$ = yytext.slice(1, -1)
-             .replace(/(^|[^\\])\\'/, "'")
-             .replace(/(^|[^\\])\\"/, '"')
-             .replace(/(^|[^\\])\\b/, "\b")
-             .replace(/(^|[^\\])\\f/, "\f")
-             .replace(/(^|[^\\])\\n/, "\n")
-             .replace(/(^|[^\\])\\r/, "\r")
-             .replace(/(^|[^\\])\\t/, "\t")
-             .replace(/(^|[^\\])\\v/, "\v")
-             .replace(/\\\\/, "\\");
-    }
+  : STRING { $$ = substituteEscapes(yytext.slice(1, -1)); }
   ;
 
 regexp
