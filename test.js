@@ -94,6 +94,7 @@ function test(rum_code, js_code){
     d("Expected: ", expected_ast);
     util.puts("");
     d("Actual: ", given_ast);
+    d("Actual js:\n---\n" + escodegen.generate(given_ast) + "\n---\n");
 
     throw("failed: `" + rum_code + "` != `" + js_code + "`");
   }
