@@ -84,6 +84,15 @@ Value: boolean
 
 Value: y or z
 
+    (if foo
+      (do-something))
+    ;=> if(foo){ do_something(); }
+
+1-clause if is allowed in RumCoke (although using `when` is preferred for
+this case).
+
+Value: 1-clause if does not have a value
+
 `case`
 ------
 

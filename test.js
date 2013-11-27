@@ -113,7 +113,7 @@ function testm(rum_code, expanded_code){
   }
 }
 
-// Literals / macro inside literals
+// Literals
 test("a", "a");
 test("$a", "$a");
 test("#t", "true");
@@ -132,7 +132,7 @@ test('"\\t\\t"', '"\\t\\t"');
 test('"\\\\n"', '"\\\\n"');
 test('#/foo/', '/foo/');
 test('(f (a: 1 b: 2))', 'f({"a": 1, "b": 2})');
-test("(f (a: 'q))", 'f({"a": Sym("q")})');
+test("(f (a: 'q))", 'f({"a": Sym("q")})'); // macro inside object literal
 
 // Special forms / macro inside special forms
 test("(define a 1)", "var a = 1;");
@@ -270,3 +270,8 @@ testm("`(',b)",   '(append (array \
 testm("`(1 #undefined)", '(append (array 1) (array #undefined))');
 testm('(cond (a b) (c d e))', '(if a b (if c (begin d e) #undefined))');
 testm('(cond (a b) (else c d))', '(if a b (begin c d))');
+
+// Misc.
+
+// If last expr is a 1-clause if, do not insert `return`
+test("(f (^(x) (when 1 2)))", "f(function(x){ if(1){2} })");

@@ -76,6 +76,11 @@
 (define (convert-stmts vs)
   (_.map vs convert-stmt))
 
+; Return true when `ast` does not have a value
+(define (statement? ast)
+  (or (ast.type.match #/ForStatement|ThrowStatement|WhileStatement/)
+      (and (= ast.type "IfStatement") (_.null? ast.alternate))))
+
 ; Returns array of statement, with `return` inserted to last statement
 ; (except when the last expression cannot have value.)
 (define (stmts-with-return body-exprs)
@@ -84,7 +89,7 @@
       (begin
         ; Try converting body with non-value context
         (define noval-ast (convert-node body-item #f))
-        (if (noval-ast.type.match #/ForStatement|ThrowStatement|WhileStatement/)
+        (if (statement? noval-ast)
           noval-ast
           (ast "ReturnStatement"
              (argument: (convert-value body-item)))))

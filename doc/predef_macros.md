@@ -17,17 +17,17 @@ cond
       (else (throw "error")))
     ;=> Converted to successive if-then-else
 
-when
-----
+when, unless
+------------
 
     (when x
       ...)
 
-unless
-------
-
     (unless y
       ...)
+
+These are compiled to 1-clause if (`if` without `else`). You cannot
+place these in a value context.
 
 quasiquote
 ----------
