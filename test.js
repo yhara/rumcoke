@@ -128,104 +128,128 @@ test('"foo"', '"foo"');
 test('"\\n"', '"\\n"');
 test('"\\\\n"', '"\\\\n"');
 test('#/foo/', '/foo/');
-test('(array 1 2 3)', '[1,2,3]');
 test('(f (a: 1 b: 2))', 'f({"a": 1, "b": 2})');
-test("(f (a: (quote x)))", 'f({"a": Sym("x")})');
+test("(f (a: 'q))", 'f({"a": Sym("q")})');
 
 // Special forms / macro inside special forms
 test("(define a 1)", "var a = 1;");
 test("(define (f) 1)", "var f = function(){ return 1; };");
-test("(define x (quote x))", "var x = Sym('x')");
+test("(define x 'q)", "var x = Sym('q')");
 
 test("((^(x) x))", "(function(x){ return x })()");
-test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
+test("((^(x) 'q))", "(function(x){ return Sym('q') })()");
 
 test("(.. a b)", "a.b");
 test("(.. a (b 1))", "a.b(1)");
-test("(.. (quote x) y)", "Sym('x').y");
-test("(.. (quote x) (y (quote z)))", "Sym('x').y(Sym('z'))");
+test("(.. 'q x)", "Sym('q').x");
+test("(.. 'q (x 'r))", "Sym('q').x(Sym('r'))");
 
 test("(set! x 1)", "x = 1");
 test("(set! x.y 1)", "x.y = 1");
 test("(set! x.y.z ab.cd.ef)", "x.y.z = ab.cd.ef");
-test("(set! x (quote x))", "x = Sym('x')");
+test("(set! x 'q)", "x = Sym('q')");
 
 test("(aset! x y 1)", "x[y] = 1");
-test("(aset! x (quote x) y)", "x[Sym('x')] = y");
+test("(aset! x 'q 'r)", "x[Sym('q')] = Sym('r')");
 
 test("(~ a b)", "a[b]");
 test("(~ a b c)", "a[b][c]");
-test("(~ (quote x) 0)", "Sym('x')[0]");
+test("(~ 'q 'r)", "Sym('q')[Sym('r')]");
 
 test("(new Date 2012 1 1)", "new Date(2012, 1, 1)");
-test("(new (quote x))", "new (Sym('x'))");
+test("(new 'q)", "new (Sym('q'))");
 
 test("(array 1 2)", "[1,2]");
-test("(array (quote x))", "[Sym('x')]");
+test("(array 'q)", "[Sym('q')]");
 
 test("(= x 1)", "x === 1");
-test("(= (quote x) y)", "Sym('x') === y");
+test("(= 'q y)", "Sym('q') === y");
 
 test("(if x y z)", "if(x) y; else z");
 test("(if x (begin 1))", "if(x){ 1 }");
 test("(f (if x (begin 1)))", "f(x ? (function(){return 1}).call(this) : void 0);");
-//test("(if (quote x) (quote y) z)", "if(Sym('x')){ Sym('y') }else z");
+test("(if 'q 'r 's)", "if(Sym('q')) Sym('r'); else Sym('s')");
 
 test("(case a ((b c) d) )", 'switch(a){ case b: case c: d; break; }');
 test("(case a (else c))", 'switch(a){ default: c; }');
 test("(print (case a (else c)))", 'print((function(){ \
                                             switch(a){ default: return c; }\
                                           }).call(this))');
+//FIXME: test("(case 'q (else 't))", "switch(Sym('q')){ default: Sym('t'); }");
 
-test("(begin (quote x))", "{Sym('x')}");
+test("(f (begin 1 2))", "f((function(){1; return 2}).call(this))");
+test("(begin 'q)", "{Sym('q')}");
 
 test("(and x y)", "x && y"); 
-test("(and (quote x) y)", "Sym('x') && y");
+test("(and 'q y)", "Sym('q') && y");
 
 test("(or)", "false"); 
 test("(or x)", "x || false"); 
 test("(or x y)", "x || y"); 
 test("(or x y z)", "x || y || z"); 
-test("(or (quote x) y)", "Sym('x') || y");
+test("(or 'q y)", "Sym('q') || y");
 
 test("(not x)", "!x");
-test("(not (quote x))", "!Sym('x')");
+test("(not 'q)", "!Sym('q')");
 
 test("(while 1 (f))", "while(1){ f(); }");
 test("(while 1 (f) (g))", "while(1){ f(); g(); }");
 test("(while 1 (break))", "while(1){ break }");
-test("(while (quote x) (quote y))", "while(Sym('x')){ Sym('y') }");
+test("(while 'q 'r)", "while(Sym('q')){ Sym('r') }");
 
 test("(for (set! i 0) (< i 3) (inc! i) 1)", "for(i=0; i<3; i++){ 1 }");
 test("((^(x) (for #f #f #f 1)))", "(function(x){for(false;false;false){ 1 }})()");
+//FIXME: test("(for (set! i 0) (< i 3) (inc! i) 'q)", "for(i=0; i<3; i++){ Sym('q') }");
+
+test("(while 1 (break))", "while(1){break}");
 
 test("(throw x)", "throw x");
-test("(throw (quote x))", "throw(Sym('x'))");
-
 test("((^(x) (throw 1)))", "(function(x){throw 1;})()");
+test("(throw 'q)", "throw(Sym('q'))");
+
 test("(instance? x y)", "x instanceof y");
-test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
+//FIXME: test("(instance? 'q 'r)", "Sym('q') instanceof Sym('r')");
+
 test("(inc! x)", "x++");
+//TODO: (inc! (id 7)) with (define-macro (id x) x)
+
 test("(dec! x.y)", "x.y--");
+//TODO: (dec! (id 7)) with (define-macro (id x) x)
 
 test('(raw-js-ast (type: "Literal" value: 7))', "7");
+//FIXME: test('(raw-js-ast (type: "Literal" value: \'x))', "Sym('x')");
 
 test("(+ x y z)", "x + y + z");
 test("(+)", "0");
 test("(+ 3)", "3");
 test("(+ -3)", "-3");
+//FIXME: test("(+ '7)", "7");
+
 test("(- x y z)", "x - y - z");
 test("(- 3)", "-3");
+//FIXME: test("(- '7)", "-7");
+
 test("(* x y z)", "x * y * z");
 test("(*)", "1");
 test("(* 3)", "3");
 test("(* -3)", "-3");
+//FIXME: test("(* '7)", "7");
+
 test("(/ x y z)", "x / y / z");
 test("(/ 3)", "1/3");
+//FIXME: test("(/ '7)", "1/7");
+
 test("(< x y z)", "x < y && y < z");
+//FIXME: test("(< 1 '7)", "1 < 7");
+
 test("(> x y z)", "x > y && y > z");
+//FIXME: test("(> 1 '7)", "1 > 7");
+
 test("(<= x y z)", "x <= y && y <= z");
+//FIXME: test("(<= 1 '7)", "1 <= 7");
+
 test("(>= x y z)", "x >= y && y >= z");
+//FIXME: test("(>= 1 '7)", "1 >= 7");
 
 // Macros
 test("(quote x)", "Sym('x')");
