@@ -24,6 +24,8 @@ var d = function (header, value) {
   util.debug(header + util.inspect(value, false, null, true));
 };
 
+// Compare objects a and b
+// (For debug use)
 function isEqv(a, b){
   var toString = Object.prototype.toString;
   var ret = null;
@@ -146,7 +148,7 @@ test("(array 1 2)", "[1,2]");
 test("(= x 1)", "x === 1");
 test("(if x y z)", "if(x) y; else z");
 test("(if x (begin 1))", "if(x){ 1 }");
-test("(f (if x (begin 1)))", "f(x ? (function(){return 1})() : void 0);");
+test("(f (if x (begin 1)))", "f(x ? (function(){return 1}).call(this) : void 0);");
 test("(and x y)", "x && y"); 
 test("(or)", "false"); 
 test("(or x)", "x || false"); 
@@ -201,7 +203,7 @@ test("(case a ((b c) d) )", 'switch(a){ case b: case c: d; break; }');
 test("(case a (else c))", 'switch(a){ default: c; }');
 test("(print (case a (else c)))", 'print((function(){ \
                                             switch(a){ default: return c; }\
-                                          })())');
+                                          }).call(this))');
 test("(begin (quote x))", "{Sym('x')}");
 test("(and (quote x) y)", "Sym('x') && y");
 test("(or (quote x) y)", "Sym('x') || y");

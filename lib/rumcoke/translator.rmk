@@ -42,6 +42,7 @@
   (append (array obj) ary))
 
 (define (ast typename info)
+  (or info (set! info (new Object)))
   (aset! info "type" typename)
   info)
 
@@ -128,6 +129,16 @@
      declarations: (array (ast "VariableDeclarator"
                             (id: (convert-node fname)
                              init: (function-with-return params (array) rest)))))))
+
+; Generate (`func-ast`).call(this)
+(define (call-with-current-this func-ast)
+  (ast "CallExpression"
+    (arguments: (array (ast "ThisExpression"))
+     callee: 
+       (ast "MemberExpression"
+         (computed: #f
+          object: func-ast
+          property: (ast "Identifier" (name: "call")))))))
 
 (define syntaxes
   ; (define x 1)
@@ -268,19 +279,16 @@
                              (body-converter body)
                              (ast "BreakStatement" (label: null))))))))))))))
      (if value-needed?
-       (ast "CallExpression"
-         (arguments: (array)
-          callee: (function-expression (array) (array)
-                                       (ast "BlockStatement"
-                                         (body: (array switch-ast))))))
+       (call-with-current-this
+         (function-expression (array) (array)
+            (ast "BlockStatement" (body: (array switch-ast)))))
        switch-ast))
 
    ; (begin ...)
    "begin": (^(v value-needed?)
      (if value-needed?
-       (ast "CallExpression"
-         (arguments: (array)
-          callee: (function-with-return (array) (array) (v.slice 1))))
+       (call-with-current-this
+         (function-with-return (array) (array) (v.slice 1)))
        (ast "BlockStatement"
          (body: (_.map (v.slice 1) convert-stmt)))))
 
