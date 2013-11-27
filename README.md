@@ -1,5 +1,5 @@
-RumCoke - JavaScript in Scheme syntax
-=====================================
+RumCoke - JavaScript in S-Expression
+====================================
 
 RumCoke is a programming language with lisp-like syntax and
 translated into JavaScript.
@@ -20,8 +20,8 @@ Features
 
 TODO
 
-* Lisp style macro
-* Source Map
+* User defined macro
+* Source Map?
 
 Example
 -------
