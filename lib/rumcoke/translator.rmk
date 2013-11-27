@@ -220,7 +220,7 @@
         left: (convert-value (~ v 1))
         right: (convert-value (~ v 2)))))
 
-   ; (if x y)
+   ; (if x y)  ;; `when` is preferred for explicitness
    ; (if x y z)
    "if": (^(v value-needed?)
      (if value-needed?
@@ -562,16 +562,14 @@
 
       #undefined))
 
-  ; (when test body...)
+  ; (when test body...) => (if test body...)
   "when": (^(v)
     `(if ,(~ v 1)
-       (begin ,@(v.slice 2))
-       #undefined))
+       (begin ,@(v.slice 2))))
 
-  ; (unless test body...)
+  ; (unless test body...) => (if (not test) body...)
   "unless": (^(v)
-    `(if ,(~ v 1)
-       #undefined
+    `(if (not ,(~ v 1))
        (begin ,@(v.slice 2))))
 
   ; (quasiquote a (unquote b) (unquote-splicing c))

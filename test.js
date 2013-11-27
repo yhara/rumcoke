@@ -211,8 +211,8 @@ test("(throw (quote x))", "throw(Sym('x'))");
 // Macros
 test("(quote x)", "Sym('x')");
 test("(quote (x y))", "[Sym('x'), Sym('y')]");
-testm("(when x y z)", "(if x (begin y z) #undefined)");
-testm("(unless x y z)", "(if x #undefined (begin y z))");
+testm("(when x y z)", "(if x (begin y z))");
+testm("(unless x y z)", "(if (not x) (begin y z))");
 
 testm("`(a b)", '(append (array (Sym "a")) (array (Sym "b")))');
 testm("`(,a ,b)", '(append (array a) (array b))');
