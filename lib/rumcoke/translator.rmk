@@ -531,7 +531,10 @@
         (else
          `(array ,x))))))))
 
-; Macro
+;
+; Macro expansion
+;
+
 (define (_quote a)
   (if (symbol? a)
     (array 'Sym a.name)
@@ -539,6 +542,7 @@
       (cons 'array (a.map _quote))
       a)))
 
+; Predefined macros
 (define macros
   ; (quote expr)
   ("quote": (^(v) 
@@ -589,6 +593,8 @@
   ))
    
 ; Expand macros in rum-expression `v`
+; Note: this should be revised every time when special-form is added
+;
 ; mod :: modifided flag (just pass undefined for first call)
 (define (expand-macros v mod)
   (or mod (set! mod (new Object)))
@@ -601,12 +607,17 @@
         (if (~ syntaxes car.name)
           ; Special forms
           (cond
-            ((_.contains (array 'define '^ 'set! 'aset!) car)
+            ; 1st argument is not expr
+            ((_.contains '(define ^ set! aset!) car)
              (append (v.slice 0 2)
                      (_.map (v.slice 2) expand-inner)))
-            ((_.contains (array 'throw 'not 'and 'or '~ 'new 'array
-                                '= 'if 'begin 'while) car)
-             (v.map expand-inner))
+            ; every argument is expr
+            ((_.contains '(~ new array = if case begin
+                           and or not while for while throw 
+                           instance? inc! dec! raw-js-ast
+                           + - * / < > <= >=)
+                         car)
+             (_.map v expand-inner))
             ((= '.. car)
              (append (array '.. (expand-macros (~ v 1) mod))
                      (_.map (v.slice 2) (^(c)
@@ -646,6 +657,8 @@
         (new RumExpr.ObjExpr ret))
       ; Literals
       v)))
+
+;----
 
 (define $debug #f)
 

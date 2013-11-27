@@ -175,7 +175,7 @@ test("(case a (else c))", 'switch(a){ default: c; }');
 test("(print (case a (else c)))", 'print((function(){ \
                                             switch(a){ default: return c; }\
                                           }).call(this))');
-//FIXME: test("(case 'q (else 't))", "switch(Sym('q')){ default: Sym('t'); }");
+test("(case 'q (else 't))", "switch(Sym('q')){ default: Sym('t'); }");
 
 test("(f (begin 1 2))", "f((function(){1; return 2}).call(this))");
 test("(begin 'q)", "{Sym('q')}");
@@ -199,7 +199,7 @@ test("(while 'q 'r)", "while(Sym('q')){ Sym('r') }");
 
 test("(for (set! i 0) (< i 3) (inc! i) 1)", "for(i=0; i<3; i++){ 1 }");
 test("((^(x) (for #f #f #f 1)))", "(function(x){for(false;false;false){ 1 }})()");
-//FIXME: test("(for (set! i 0) (< i 3) (inc! i) 'q)", "for(i=0; i<3; i++){ Sym('q') }");
+test("(for (set! i 0) (< i 3) (inc! i) 'q)", "for(i=0; i<3; i++){ Sym('q') }");
 
 test("(while 1 (break))", "while(1){break}");
 
@@ -208,7 +208,7 @@ test("((^(x) (throw 1)))", "(function(x){throw 1;})()");
 test("(throw 'q)", "throw(Sym('q'))");
 
 test("(instance? x y)", "x instanceof y");
-//FIXME: test("(instance? 'q 'r)", "Sym('q') instanceof Sym('r')");
+test("(instance? 'q 'r)", "Sym('q') instanceof Sym('r')");
 
 test("(inc! x)", "x++");
 //TODO: (inc! (id 7)) with (define-macro (id x) x)
@@ -223,33 +223,33 @@ test("(+ x y z)", "x + y + z");
 test("(+)", "0");
 test("(+ 3)", "3");
 test("(+ -3)", "-3");
-//FIXME: test("(+ '7)", "7");
+test("(+ '7)", "7");
 
 test("(- x y z)", "x - y - z");
 test("(- 3)", "-3");
-//FIXME: test("(- '7)", "-7");
+test("(- '7)", "-7");
 
 test("(* x y z)", "x * y * z");
 test("(*)", "1");
 test("(* 3)", "3");
 test("(* -3)", "-3");
-//FIXME: test("(* '7)", "7");
+test("(* '7)", "7");
 
 test("(/ x y z)", "x / y / z");
 test("(/ 3)", "1/3");
-//FIXME: test("(/ '7)", "1/7");
+test("(/ '7)", "1/7");
 
 test("(< x y z)", "x < y && y < z");
-//FIXME: test("(< 1 '7)", "1 < 7");
+test("(< 1 '7)", "1 < 7");
 
 test("(> x y z)", "x > y && y > z");
-//FIXME: test("(> 1 '7)", "1 > 7");
+test("(> 1 '7)", "1 > 7");
 
 test("(<= x y z)", "x <= y && y <= z");
-//FIXME: test("(<= 1 '7)", "1 <= 7");
+test("(<= 1 '7)", "1 <= 7");
 
 test("(>= x y z)", "x >= y && y >= z");
-//FIXME: test("(>= 1 '7)", "1 >= 7");
+test("(>= 1 '7)", "1 >= 7");
 
 // Macros
 test("(quote x)", "Sym('x')");
