@@ -112,7 +112,7 @@ function testm(rum_code, expanded_code){
   }
 }
 
-// Literals
+// Literals / macro inside literals
 test("a", "a");
 test("$a", "$a");
 test("#t", "true");
@@ -129,38 +129,78 @@ test('"\\\\n"', '"\\\\n"');
 test('#/foo/', '/foo/');
 test('(array 1 2 3)', '[1,2,3]');
 test('(f (a: 1 b: 2))', 'f({"a": 1, "b": 2})');
+test("(f (a: (quote x)))", 'f({"a": Sym("x")})');
 
-// Special forms
+// Special forms / macro inside special forms
 test("(define a 1)", "var a = 1;");
 test("(define (f) 1)", "var f = function(){ return 1; };");
+test("(define x (quote x))", "var x = Sym('x')");
+
 test("((^(x) x))", "(function(x){ return x })()");
+test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
+
 test("(.. a b)", "a.b");
 test("(.. a (b 1))", "a.b(1)");
+test("(.. (quote x) y)", "Sym('x').y");
+test("(.. (quote x) (y (quote z)))", "Sym('x').y(Sym('z'))");
+
 test("(set! x 1)", "x = 1");
 test("(set! x.y 1)", "x.y = 1");
 test("(set! x.y.z ab.cd.ef)", "x.y.z = ab.cd.ef");
+test("(set! x (quote x))", "x = Sym('x')");
+
 test("(aset! x y 1)", "x[y] = 1");
-test("(new Date 2012 1 1)", "new Date(2012, 1, 1)");
+test("(aset! x (quote x) y)", "x[Sym('x')] = y");
+
 test("(~ a b)", "a[b]");
 test("(~ a b c)", "a[b][c]");
+test("(~ (quote x) 0)", "Sym('x')[0]");
+
+test("(new Date 2012 1 1)", "new Date(2012, 1, 1)");
+test("(new (quote x))", "new (Sym('x'))");
+
 test("(array 1 2)", "[1,2]");
-// test(quote
+test("(array (quote x))", "[Sym('x')]");
+
 test("(= x 1)", "x === 1");
+test("(= (quote x) y)", "Sym('x') === y");
+
 test("(if x y z)", "if(x) y; else z");
 test("(if x (begin 1))", "if(x){ 1 }");
 test("(f (if x (begin 1)))", "f(x ? (function(){return 1}).call(this) : void 0);");
+//test("(if (quote x) (quote y) z)", "if(Sym('x')){ Sym('y') }else z");
+
+test("(case a ((b c) d) )", 'switch(a){ case b: case c: d; break; }');
+test("(case a (else c))", 'switch(a){ default: c; }');
+test("(print (case a (else c)))", 'print((function(){ \
+                                            switch(a){ default: return c; }\
+                                          }).call(this))');
+
+test("(begin (quote x))", "{Sym('x')}");
+
 test("(and x y)", "x && y"); 
+test("(and (quote x) y)", "Sym('x') && y");
+
 test("(or)", "false"); 
 test("(or x)", "x || false"); 
 test("(or x y)", "x || y"); 
 test("(or x y z)", "x || y || z"); 
+test("(or (quote x) y)", "Sym('x') || y");
+
 test("(not x)", "!x");
+test("(not (quote x))", "!Sym('x')");
+
 test("(while 1 (f))", "while(1){ f(); }");
 test("(while 1 (f) (g))", "while(1){ f(); g(); }");
 test("(while 1 (break))", "while(1){ break }");
+test("(while (quote x) (quote y))", "while(Sym('x')){ Sym('y') }");
+
 test("(for (set! i 0) (< i 3) (inc! i) 1)", "for(i=0; i<3; i++){ 1 }");
 test("((^(x) (for #f #f #f 1)))", "(function(x){for(false;false;false){ 1 }})()");
+
 test("(throw x)", "throw x");
+test("(throw (quote x))", "throw(Sym('x'))");
+
 test("((^(x) (throw 1)))", "(function(x){throw 1;})()");
 test("(instance? x y)", "x instanceof y");
 test("(instance? x (instance? y z))", "x instanceof (y instanceof z)");
@@ -185,31 +225,6 @@ test("(< x y z)", "x < y && y < z");
 test("(> x y z)", "x > y && y > z");
 test("(<= x y z)", "x <= y && y <= z");
 test("(>= x y z)", "x >= y && y >= z");
-
-// Macro inside special forms
-test("(f (a: (quote x)))", 'f({"a": Sym("x")})');
-test("(define x (quote x))", "var x = Sym('x')");
-test("(.. (quote x) y)", "Sym('x').y");
-test("(.. (quote x) (y (quote z)))", "Sym('x').y(Sym('z'))");
-test("((^(x) (quote x)))", "(function(x){ return Sym('x') })()");
-test("(set! x (quote x))", "x = Sym('x')");
-test("(aset! x (quote x) y)", "x[Sym('x')] = y");
-test("(new (quote x))", "new (Sym('x'))");
-test("(~ (quote x) 0)", "Sym('x')[0]");
-test("(array (quote x))", "[Sym('x')]");
-test("(= (quote x) y)", "Sym('x') === y");
-//test("(if (quote x) (quote y) z)", "if(Sym('x')){ Sym('y') }else z");
-test("(case a ((b c) d) )", 'switch(a){ case b: case c: d; break; }');
-test("(case a (else c))", 'switch(a){ default: c; }');
-test("(print (case a (else c)))", 'print((function(){ \
-                                            switch(a){ default: return c; }\
-                                          }).call(this))');
-test("(begin (quote x))", "{Sym('x')}");
-test("(and (quote x) y)", "Sym('x') && y");
-test("(or (quote x) y)", "Sym('x') || y");
-test("(not (quote x))", "!Sym('x')");
-test("(while (quote x) (quote y))", "while(Sym('x')){ Sym('y') }");
-test("(throw (quote x))", "throw(Sym('x'))");
 
 // Macros
 test("(quote x)", "Sym('x')");
