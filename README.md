@@ -1,13 +1,12 @@
 RumCoke - JavaScript in S-Expression
 ====================================
 
-RumCoke is a programming language with lisp-like syntax and
-translated into JavaScript.
-It is like CoffeeScript based on S-Expression.
+RumCoke is a programming language which has lisp syntax and JavaScript semantics.
+The idea is, "What if CoffeeScript is based on S-Expression?"
 
 ### Current state
 
-Experimental (just started)
+Experimental
 
 Features
 --------
@@ -37,6 +36,14 @@ Node.js (tested with v0.10.20)
 
 Install
 -------
+
+Via npm.org:
+
+    $ npm install -g rumcoke
+    $ rumcoke hello.rmk | node
+    Hello, world!
+
+Via github:
 
     $ git clone https://github.com/yhara/rumcoke
     $ npm install
@@ -135,6 +142,13 @@ In this case, you should:
 1. Stop developing the new feature 
 2. Make a minimal case to reproduce the error (save it in a.rmk)
 3. `git stash` and fix the bug first
+
+#### How to release
+
+1. Edit ./lib/rumcoke/version.js
+2. Edit "version" in ./package.json
+3. git ci && git tag vX.Y.Z && git push --tags
+4. npm publish . 
 
 Why?
 ----

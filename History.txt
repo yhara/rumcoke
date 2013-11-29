@@ -1,8 +1,8 @@
 See doc/UPGRADE.mkd for list of incompatible changes.
 
 ----
-(not yet) 
-  * new: Allow '$' in identifier name
+2013-11-29 v0.2.0
+  * Added lots of things! See doc/ for supported features.
 
 2012-11-22 v0.1.1
   * change: Removed syntax `{}'

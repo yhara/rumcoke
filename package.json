@@ -1,7 +1,7 @@
 {
     "name": "rumcoke",
-    "description": "Lispy language translates into JavaScript",
-    "version": "0.0.1",
+    "description": "A language with Scheme syntax and JavaScript semantics",
+    "version": "0.2.0",
     "author": "Yutaka HARA <yutaka.hara.gmail.com> (http://twitter.com/yhara_en)",
     "homepage": "https://github.com/yhara/rumcoke/",
     "keywords": ["scheme", "lisp"],
