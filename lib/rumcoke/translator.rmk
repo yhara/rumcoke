@@ -441,17 +441,6 @@
 
   ))
 
-; Operators
-;(_.each (array "-" "/") (^(op)
-;  (aset! syntaxes op (^(v) 
-;    (raise-if (= v.length 1) (msg: (+ "malformed " op) v: v))
-;    (_.reduce (_.map (v.slice 1) convert-value) (^(a b)
-;      (ast "BinaryExpression"
-;        (operator: op
-;         left: a
-;         right: b))))))))
-
-
 (_.each (array "<" "<=" ">" ">=") (^(op)
   (aset! syntaxes op (^(v) 
     (define l (_.initial (v.slice 1))) ; 1..last-1
