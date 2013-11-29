@@ -130,13 +130,15 @@ Value: result of logical operation
 
 `while` does not have a value.
 
-`for`
------
+`for` (deprecated)
+------------------
 
     (for (set! j 0) (< j nphi) (inc! j)
     ;=> for(j=0; j<nphi; j++)
 
 `for` does not have a value.
+
+Note: `for` will be replaced with `do` in future version.
 
 `break`
 -------

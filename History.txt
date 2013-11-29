@@ -1,6 +1,9 @@
 See doc/UPGRADE.mkd for list of incompatible changes.
 
 ----
+(unreleased)
+  * deprecate `for` 
+
 2013-11-29 v0.2.0
   * Added lots of things! See doc/ for supported features.
 
