@@ -37,8 +37,6 @@
 
   v)
 
-; A案
-
 (define (Sphere center radius)
   (set! this.center center)
   (set! this.radius radius)
@@ -61,29 +59,6 @@
         (set! isect.n (vnormalize n))))))
   #f)
 
-;; B案
-;
-;(define-class (Sphere center radius)
-;  (set! @center center)
-;  (set! @radius radius))
-;
-;(define-method Sphere (intersect ray isect)
-;  (let* ((rs (vsub ray.org @center))
-;         (B  (vdot rs ray.dir))
-;         (C  (- (vdot rs rs) (* @radius @radius)))
-;         (D  (- (* B B) C)))
-;    (when (> D 0.0)
-;      (let1 t (- (- B) (Math.sqrt D))
-;        (when (< 0.0 t isect.t)
-;          (set! isect.t   t)
-;          (set! isect.hit #t)
-;          (set! isect.p
-;            (new vec (+ ray.org.x (* ray.dir.x t))
-;                     (+ ray.org.y (* ray.dir.y t))
-;                     (+ ray.org.z (* ray.dir.z t))))
-;          (let1 n (vsub isect.p @center)
-;           (set! isect.n (vnormalize n))))))))
-         
 (define (Plane p n)
   (set! this.p p)
   (set! this.n n)
