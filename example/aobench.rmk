@@ -1,0 +1,260 @@
+(define IMAGE_WIDTH 256)
+(define IMAGE_HEIGHT 256)
+(define NSUBSAMPLES 2)
+(define NAO_SAMPLES 8)
+
+(define (vec x y z)
+  (aset! this "x" x)
+  (aset! this "y" y)
+  (aset! this "z" z)
+  #undefined)
+
+(define (vadd a b)
+  (new vec (+ a.x b.x) (+ a.y b.y) (+ a.z b.z)))
+
+(define (vsub a b)
+  (new vec (- a.x b.x) (- a.y b.y) (- a.z b.z)))
+
+(define (vcross a b)
+  (new vec (- (* a.y b.z) (* a.z b.y))
+           (- (* a.z b.x) (* a.x b.z))
+           (- (* a.x b.y) (* a.y b.x))))
+
+(define (vdot a b)
+  (+ (* a.x b.x) (* a.y b.y) (* a.z b.z)))
+
+(define (vlength a)
+  (Math.sqrt (+ (* a.x a.x) (* a.y a.y) (* a.z a.z))))
+
+(define (vnormalize a)
+  (define len (vlength a))
+  (define v (new vec a.x a.y a.z))
+
+  (when (> (Math.abs len) 0.00000000000000001) ; 1.0e-17)
+    (set! v.x (/ v.x len))
+    (set! v.y (/ v.y len))
+    (set! v.z (/ v.z len)))
+
+  v)
+
+; A案
+
+(define (Sphere center radius)
+  (set! this.center center)
+  (set! this.radius radius)
+
+  (set! this.intersect (^(ray isect)
+    (define rs (vsub ray.org this.center))
+    (define B  (vdot rs ray.dir))
+    (define C  (- (vdot rs rs) (* this.radius this.radius)))
+    (define D  (- (* B B) C))
+    (when (> D 0.0)
+      (define t (- (- B) (Math.sqrt D)))
+      (when (< 0.0 t isect.t)
+        (set! isect.t   t)
+        (set! isect.hit #t)
+        (set! isect.p
+          (new vec (+ ray.org.x (* ray.dir.x t))
+                   (+ ray.org.y (* ray.dir.y t))
+                   (+ ray.org.z (* ray.dir.z t))))
+        (define n (vsub isect.p this.center))
+        (set! isect.n (vnormalize n))))))
+  #f)
+
+;; B案
+;
+;(define-class (Sphere center radius)
+;  (set! @center center)
+;  (set! @radius radius))
+;
+;(define-method Sphere (intersect ray isect)
+;  (let* ((rs (vsub ray.org @center))
+;         (B  (vdot rs ray.dir))
+;         (C  (- (vdot rs rs) (* @radius @radius)))
+;         (D  (- (* B B) C)))
+;    (when (> D 0.0)
+;      (let1 t (- (- B) (Math.sqrt D))
+;        (when (< 0.0 t isect.t)
+;          (set! isect.t   t)
+;          (set! isect.hit #t)
+;          (set! isect.p
+;            (new vec (+ ray.org.x (* ray.dir.x t))
+;                     (+ ray.org.y (* ray.dir.y t))
+;                     (+ ray.org.z (* ray.dir.z t))))
+;          (let1 n (vsub isect.p @center)
+;           (set! isect.n (vnormalize n))))))))
+         
+(define (Plane p n)
+  (set! this.p p)
+  (set! this.n n)
+
+  (set! this.intersect (^(ray isect)
+    (define d (- (vdot this.p this.n)))
+    (define v (vdot ray.dir this.n))
+    (unless (< (Math.abs v) 0.00000000000000001) ; 1.0e-17)
+      (define t (/ (- (+ (vdot ray.org n) d)) v))
+      (when (< 0.0 t isect.t)
+        (set! isect.hit true)
+        (set! isect.t   t)
+        (set! isect.n   this.n)
+        (set! isect.p   (new vec (+ ray.org.x (* t ray.dir.x))
+                                 (+ ray.org.y (* t ray.dir.y))
+                                 (+ ray.org.z (* t ray.dir.z))))))))
+  #f)
+
+(define (Ray org dir)
+  (set! this.org org)
+  (set! this.dir dir)
+  #f)
+
+(define (Isect)
+  (set! this.t 1000000.0)
+  (set! this.hit #f)
+  (set! this.p (new vec 0.0 0.0 0.0))
+  (set! this.n (new vec 0.0 0.0 0.0))
+  #f)
+
+(define (clamp f)
+  (define i (* f 255.5))
+  (when (> i 255.0) (set! i 255.0))
+  (when (< i 0.0)   (set! i 0.0))
+  (Math.round i))
+
+(define (orthoBasis basis n)
+  (aset! basis 2 (new vec n.x n.y n.z))
+  (aset! basis 1 (new vec 0.0 0.0 0.0))
+  
+  (cond
+    ((< -0.6 n.x 0.6)
+     (aset! (~ basis 1) "x" 1.0))
+    ((< -0.6 n.y 0.6)
+     (aset! (~ basis 1) "y" 1.0))
+    ((< -0.6 n.z 0.6)
+     (aset! (~ basis 1) "z" 1.0))
+    (else
+     (aset! (~ basis 1) "x" 1.0)))
+
+  (aset! basis 0 (vnormalize
+                   (vcross (~ basis 1) (~ basis 2))))
+  (aset! basis 1 (vnormalize
+                   (vcross (~ basis 2) (~ basis 0))))
+  #undefined)
+
+(define spheres)
+(define plane)
+
+(define (init_scene)
+  (set! spheres (new Array 3))
+  (aset! spheres 0 (new Sphere (new vec -2.0 0.0 -3.5) 0.5))
+  (aset! spheres 1 (new Sphere (new vec -0.5 0.0 -3.0) 0.5))
+  (aset! spheres 2 (new Sphere (new vec  1.0 0.0 -2.2) 0.5))
+  (set! plane (new Plane (new vec 0.0 -0.5 0.0)
+                         (new vec 0.0  1.0 0.0))))
+
+(define (ambient_occlusion isect)
+  (define basis (new Array 3))
+  (orthoBasis basis isect.n)
+
+  (define ntheta    NAO_SAMPLES)
+  (define nphi      NAO_SAMPLES)
+  (define eps       0.0001)
+  (define occlusion 0.0)
+
+  (define p (new vec (+ isect.p.x (* eps isect.n.x))
+                     (+ isect.p.y (* eps isect.n.y))
+                     (+ isect.p.z (* eps isect.n.z))))
+
+  (for (set! j 0) (< j nphi) (inc! j)
+    (for (set! i 0) (< i ntheta) (inc! i)
+      (define r (Math.random))
+      (define phi (* 2.0 Math.PI (Math.random)))
+
+
+      (define x (* (Math.cos phi) (Math.sqrt (- 1.0 r))))
+      (define y (* (Math.sin phi) (Math.sqrt (- 1.0 r))))
+      (define z                   (Math.sqrt r))
+
+      (define rx (+ (* x (~ basis 0 "x")) (* y (~ basis 1 "x")) (* z (~ basis 2 "x"))))
+      (define ry (+ (* x (~ basis 0 "y")) (* y (~ basis 1 "y")) (* z (~ basis 2 "y"))))
+      (define rz (+ (* x (~ basis 0 "z")) (* y (~ basis 1 "z")) (* z (~ basis 2 "z"))))
+
+      (define raydir (new vec rx ry rz))
+      (define ray (new Ray p raydir))
+
+
+      (define occIsect (new Isect))
+      ((~ spheres 0 "intersect") ray occIsect)
+      ((~ spheres 1 "intersect") ray occIsect)
+      ((~ spheres 2 "intersect") ray occIsect)
+      (plane.intersect ray occIsect)
+
+      (when occIsect.hit
+        (set! occlusion (+ occlusion 1.0)))))
+
+  (set! occlusion 
+    (/ (- (* ntheta nphi) occlusion) (* ntheta nphi)))
+
+  (new vec occlusion occlusion occlusion))
+
+(define (render ctx w h nsubsamples)
+  (define cnt 0)
+  (for (define y 0) (< y h) (inc! y)
+    (for (define x 0) (< x w) (inc! x)
+      (define rad (new vec 0.0 0.0 0.0))
+      (for (define v 0) (< v nsubsamples) (inc! v)
+        (for (define u 0) (< u nsubsamples) (inc! u)
+          (inc! cnt)
+          (define px (/    (- (+ x (/ u nsubsamples)) (/ w 2.0)) 
+                           (/ w 2.0)))
+          (define py (/ (- (- (+ y (/ v nsubsamples)) (/ h 2.0)))
+                           (/ h 2.0)))
+
+          (define eye (vnormalize (new vec px py -1.0)))
+          (define ray (new Ray (new vec 0.0 0.0 0.0) eye))
+
+          (define isect (new Isect))
+
+          (.. (~ spheres 0) (intersect ray isect))
+          (.. (~ spheres 1) (intersect ray isect))
+          (.. (~ spheres 2) (intersect ray isect))
+          (.. plane (intersect ray isect))
+
+          (if isect.hit
+            (begin
+              (define col (ambient_occlusion isect))
+              (set! rad.x (+ rad.x col.x)) 
+              (set! rad.y (+ rad.y col.y)) 
+              (set! rad.z (+ rad.z col.z)) ))))
+
+      (set! r (/ rad.x (* nsubsamples nsubsamples)))
+      (set! g (/ rad.y (* nsubsamples nsubsamples)))
+      (set! b (/ rad.z (* nsubsamples nsubsamples)))
+
+      ;(set! ctx.fillStyle
+      ;      (+ "rgb(" (clamp r) "," (clamp g) "," (clamp b) ")"))
+      ;(ctx.fillRect x y 1 1)
+      (ctx.push (clamp r) (clamp g) (clamp b))
+      )))
+
+(define (main)
+  (process.stdout.write "P6\n")
+  (process.stdout.write (+ IMAGE_WIDTH " " IMAGE_HEIGHT "\n"))
+  (process.stdout.write "255\n")
+
+  (define buf (array))
+
+  (define elapsed 0)
+  (define start (new Date))
+  (init_scene)
+  (render buf IMAGE_WIDTH IMAGE_HEIGHT 1)
+
+  (set! elapsed (- (new Date) start))
+
+  (process.stderr.write (+ "Time: " (/ elapsed 1000.0) "\n"))
+
+  (define buffer (new Buffer buf.length))
+  (for (define i 0) (< i buf.length) (inc! i)
+    (buffer.writeUInt8 (~ buf i) i))
+  (process.stdout.write buffer))
+
+(main)
