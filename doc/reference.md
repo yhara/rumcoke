@@ -85,6 +85,12 @@ there is a variable named `undefined`.
       (do-something)
       #undefined)
 
+### Regexp
+
+    #/foo/     ;=> /foo/
+
+TODO: /i, /m, /x
+
 ### Object
 
     (a: 1 b: 2)           ;=> {a: 1, b: 2}
@@ -92,10 +98,15 @@ there is a variable named `undefined`.
     (new Date 2013 1 1)   ;=> new Date(2013, 1, 1);
 
     (.. obj foo)          ;=> obj.foo  (property access)
+    obj.foo               ;=> obj.foo  (property access, normal way)
 
     (.. obj foo bar)      ;=> obj.foo.bar  (successive property access)
 
     (.. obj (foo bar))    ;=> obj.foo(bar)   (method call)
+
+Note: property access expression (`obj.foo`) can be left hand side of `set!`
+
+    (set! obj.foo 1)      ;=> obj.foo = 1;
 
 ## Operators
 

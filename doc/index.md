@@ -10,6 +10,4 @@ Language
 
 [Rum Expression](rum_expr.md)
 
-[Syntax](syntax.md)
-
 [FAQ](faq.md)
