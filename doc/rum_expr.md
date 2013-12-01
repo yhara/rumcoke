@@ -1,6 +1,10 @@
 Rum-Expression
 ==============
 
+Note: This document should be revised.
+
+----
+
 Lisp program is constructed with S-Expression.
 Similarly, RumCoke program is constructed with Rum-Expression.
 
