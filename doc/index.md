@@ -6,11 +6,9 @@ Documents
 Language
 --------
 
+[Reference](reference.md)
+
 [Rum Expression](rum_expr.md)
-
-[Special Forms](special_forms.md)
-
-[Predeifned macros](predef_macros.md)
 
 [Syntax](syntax.md)
 
