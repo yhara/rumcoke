@@ -214,9 +214,11 @@ test("(instance? x y)", "x instanceof y");
 test("(instance? 'q 'r)", "Sym('q') instanceof Sym('r')");
 
 test("(inc! x)", "x++");
+test("(inc! x 3)", "x += 3");
 //TODO: (inc! (id 7)) with (define-macro (id x) x)
 
 test("(dec! x.y)", "x.y--");
+test("(dec! x 3)", "x -= 3");
 //TODO: (dec! (id 7)) with (define-macro (id x) x)
 
 test('(raw-js-ast (type: "Literal" value: 7))', "7");

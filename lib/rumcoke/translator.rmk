@@ -367,20 +367,32 @@
         right: (convert-value (~ v 2)))))
 
    ; (inc! x)
+   ; (inc! x dx)
    "inc!": (^(v)
-     (raise-if (not (= v.length 2)) (msg: "malformed inc!" v: v))
-     (ast "UpdateExpression"
-       (operator: "++"
-        argument: (convert-value (~ v 1))
-        prefix: #f)))
+     (raise-if (or (= v.length 0) (> v.length 3)) (msg: "malformed inc!" v: v))
+     (if (_.undefined? (~ v 2))
+       (ast "UpdateExpression"
+         (operator: "++"
+          argument: (convert-value (~ v 1))
+          prefix: #f))
+       (ast "AssignmentExpression"
+         (operator: "+="
+          left: (ast "Identifier" (convert-value (~ v 1)))
+          right: (convert-value (~ v 2))))))
 
    ; (dec! x)
+   ; (dec! x dx)
    "dec!": (^(v)
-     (raise-if (not (= v.length 2)) (msg: "malformed dec!" v: v))
-     (ast "UpdateExpression"
-       (operator: "--"
-        argument: (convert-value (~ v 1))
-        prefix: #f)))
+     (raise-if (or (= v.length 0) (> v.length 3)) (msg: "malformed dec!" v: v))
+     (if (_.undefined? (~ v 2))
+       (ast "UpdateExpression"
+         (operator: "--"
+          argument: (convert-value (~ v 1))
+          prefix: #f))
+       (ast "AssignmentExpression"
+         (operator: "-="
+          left: (ast "Identifier" (convert-value (~ v 1)))
+          right: (convert-value (~ v 2))))))
 
    ; (raw-js-ast (ast "FooStatement" ...))
    "raw-js-ast": (^(v)
